@@ -1659,32 +1659,13 @@ void CXXNameMangler::mangleUnqualifiedName(
       }
     }
 
-    if (TD->isExternallyVisible()) {
-      unsigned UnnamedMangle =
-          getASTContext().getManglingNumber(TD, Context.isAux());
-      Out << "Ut";
-      if (UnnamedMangle > 1)
-        Out << UnnamedMangle - 2;
-      Out << '_';
-      writeAbiTags(TD, AdditionalAbiTags);
-      break;
-    }
-
-    // Get a unique id for the anonymous struct. If it is not a real output
-    // ID doesn't matter so use fake one.
-    unsigned AnonStructId =
-        NullOut ? 0
-                : Context.getAnonymousStructId(TD, dyn_cast<FunctionDecl>(DC));
-
-    // Mangle it as a source name in the form
-    // [n] $_<id>
-    // where n is the length of the string.
-    SmallString<8> Str;
-    Str += "$_";
-    Str += llvm::utostr(AnonStructId);
-
-    Out << Str.size();
-    Out << Str;
+    unsigned UnnamedMangle =
+        getASTContext().getManglingNumber(TD, Context.isAux());
+    Out << "Ut";
+    if (UnnamedMangle > 1)
+      Out << UnnamedMangle - 2;
+    Out << '_';
+    writeAbiTags(TD, AdditionalAbiTags);
     break;
   }
 
