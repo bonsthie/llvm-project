@@ -1659,11 +1659,11 @@ void CXXNameMangler::mangleUnqualifiedName(
       }
     }
 
-    unsigned UnnamedMangle =
-        getASTContext().getManglingNumber(TD, Context.isAux());
+    unsigned AnonStructId =
+        Context.getAnonymousStructId(TD, dyn_cast<FunctionDecl>(DC));
     Out << "Ut";
-    if (UnnamedMangle > 1)
-      Out << UnnamedMangle - 2;
+    if (AnonStructId > 0)
+      Out << AnonStructId - 1;
     Out << '_';
     writeAbiTags(TD, AdditionalAbiTags);
     break;
