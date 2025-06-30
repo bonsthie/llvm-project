@@ -501,8 +501,7 @@ void Sema::handleLambdaNumbering(
   MangleNumberingContext *MCtx;
   std::tie(MCtx, Numbering.ContextDecl) =
       getCurrentMangleNumberContext(Class->getDeclContext());
-  if (!MCtx && (getLangOpts().CUDA || getLangOpts().SYCLIsDevice ||
-                getLangOpts().SYCLIsHost)) {
+  if (!MCtx) {
     // Force lambda numbering in CUDA/HIP as we need to name lambdas following
     // ODR. Both device- and host-compilation need to have a consistent naming
     // on kernel functions. As lambdas are potential part of these `__global__`
@@ -514,6 +513,7 @@ void Sema::handleLambdaNumbering(
     assert(MCtx && "Retrieving mangle numbering context failed!");
     Numbering.HasKnownInternalLinkage = true;
   }
+
   if (MCtx) {
     Numbering.IndexInContext = MCtx->getNextLambdaIndex();
     Numbering.ManglingNumber = MCtx->getManglingNumber(Method);

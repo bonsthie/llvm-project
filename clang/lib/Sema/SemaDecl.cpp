@@ -4914,6 +4914,11 @@ void Sema::handleTagNumbering(const TagDecl *Tag, Scope *TagScope) {
   Decl *ManglingContextDecl;
   std::tie(MCtx, ManglingContextDecl) =
       getCurrentMangleNumberContext(Tag->getDeclContext());
+
+  // If no existing context and this tag is anonymous, use the TU context
+  if (!MCtx && !Tag->getIdentifier())
+    MCtx = &Context.getManglingNumberContext(nullptr);
+
   if (MCtx) {
     Context.setManglingNumber(
         Tag, MCtx->getManglingNumber(
