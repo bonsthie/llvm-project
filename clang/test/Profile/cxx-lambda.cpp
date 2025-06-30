@@ -11,7 +11,7 @@
 
 // PGOGEN: @[[LWC:__profc__Z7lambdasv]] = {{(private|internal)}} global [4 x i64] zeroinitializer
 // PGOGEN: @[[MAC:__profc_main]] = {{(private|internal)}} global [1 x i64] zeroinitializer
-// LMBGEN: @[[LFC:"__profc_cxx_lambda.cpp__ZZ7lambdasvENK3\$_0clEi"]] = {{(private|internal)}} global [4 x i64] zeroinitializer
+// LMBGEN: @[[LFC:__profc_cxx_lambda.cpp__ZZ7lambdasvENKUliE_clEi]] = {{(private|internal)}} global [4 x i64] zeroinitializer
 
 // PGOGEN-LABEL: define {{.*}}void @_Z7lambdasv()
 // PGOUSE-LABEL: define {{.*}}void @_Z7lambdasv()
@@ -19,8 +19,8 @@
 void lambdas() {
   int i = 1;
 
-  // LMBGEN-LABEL: define internal{{( [0-9_a-z]*cc)?( noundef)?( zeroext)?}} i1 @"_ZZ7lambdasvENK3$_0clEi"(
-  // LMBUSE-LABEL: define internal{{( [0-9_a-z]*cc)?( noundef)?( zeroext)?}} i1 @"_ZZ7lambdasvENK3$_0clEi"(
+  // LMBGEN-LABEL: define internal{{( [0-9_a-z]*cc)?( noundef)?( zeroext)?}} i1 @_ZZ7lambdasvENKUliE_clEi(
+  // LMBUSE-LABEL: define internal{{( [0-9_a-z]*cc)?( noundef)?( zeroext)?}} i1 @_ZZ7lambdasvENKUliE_clEi(
   // LMBGEN: store {{.*}} @[[LFC]]
   auto f = [&i](int k) {
     // LMBGEN: store {{.*}} @[[LFC]], i32 0, i32 1

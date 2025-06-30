@@ -44,7 +44,7 @@ int nested(int a){
   #pragma omp target
     ++a;
 
-  // CHECK: call void @"[[LNAME:.+]]"(ptr
+  // CHECK: call void @[[LNAME:.+]](ptr
   auto F = [&](){
     #pragma omp parallel
     {
@@ -61,7 +61,7 @@ int nested(int a){
 // CHECK: define {{.*}}void @__omp_offloading_[[FILEID]]_[[NNAME]]_l[[T1L]](
 // TCHECK: define {{.*}}void @__omp_offloading_[[FILEID:[0-9a-f]+_[0-9a-f]+]]_[[NNAME:.+]]_l[[T1L:[0-9]+]](
 
-// CHECK: define {{.*}}void @"[[LNAME]]"(
+// CHECK: define {{.*}}void @[[LNAME]](
 // CHECK: call void {{.*}}@__kmpc_fork_call{{.+}}[[PNAME:@[^,]+]]
 
 // CHECK: define {{.*}}void [[PNAME]](

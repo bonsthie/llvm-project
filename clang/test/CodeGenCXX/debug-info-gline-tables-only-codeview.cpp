@@ -39,7 +39,7 @@ void test() {
 
   // CHECK: !DISubprogram(name: "operator()", scope: ![[LAMBDA0:[0-9]+]],
   // CHECK: ![[LAMBDA0]] = !DICompositeType(tag: DW_TAG_class_type,
-  // CHECK-SAME:                            name: "<lambda_0>",
+  // CHECK-SAME:                            name: "<lambda_1>",
   // CHECK-SAME:                            flags: DIFlagFwdDecl
   lambda1();
 

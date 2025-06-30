@@ -55,7 +55,7 @@ void frameSizeLocalClassWarning() {
 
 void frameSizeLambdaWarning() {
   auto fn =
-      []() { // expected-warning-re {{stack frame size ({{[0-9]+}}) exceeds limit ({{[0-9]+}}) in 'frameSizeLambdaWarning()::$_0::operator()() const'}}
+      []() { // expected-warning-re {{stack frame size ({{[0-9]+}}) exceeds limit ({{[0-9]+}}) in 'frameSizeLambdaWarning()::'unnamed'::operator()() const'}}
     char buffer[80];
     doIt(buffer);
   };

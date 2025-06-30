@@ -2,11 +2,11 @@
 
 // This code used to cause an assertion failure in EmitDelegateCallArg.
 
-// CHECK-LABEL: define internal void @"?__invoke@<lambda_0>@?0??test@@YAXXZ@CA@UTrivial@@@Z"(
+// CHECK-LABEL: define internal void @"?__invoke@<lambda_1>@?0??test@@YAXXZ@CA@UTrivial@@@Z"(
 // CHECK: %unused.capture = alloca %class.anon, align 1
-// CHECK: call void @"??R<lambda_0>@?0??test@@YAXXZ@QEBA@UTrivial@@@Z"(ptr noundef nonnull align 1 dereferenceable(1) %unused.capture,
+// CHECK: call void @"??R<lambda_1>@?0??test@@YAXXZ@QEBA@UTrivial@@@Z"(ptr noundef nonnull align 1 dereferenceable(1) %unused.capture,
 
-// CHECK: define internal void @"??R<lambda_0>@?0??test@@YAXXZ@QEBA@UTrivial@@@Z"(ptr noundef nonnull align 1 dereferenceable(1) %this,
+// CHECK: define internal void @"??R<lambda_1>@?0??test@@YAXXZ@QEBA@UTrivial@@@Z"(ptr noundef nonnull align 1 dereferenceable(1) %this,
 
 struct Trivial {
   int x;

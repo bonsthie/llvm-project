@@ -101,8 +101,8 @@ int main(int argc, char* argv[], char* arge[]) {
   // MSVC-SAME:      )
   // MSVC:       [[TYPE_OF_FOUR]] = distinct !DICompositeType
   // MSVC-SAME:      tag: DW_TAG_class_type
-  // MSVC-SAME:      name: "<lambda_0>"
-  // MSVC-SAME:      identifier: ".?AV<lambda_0>@?0??main@@9@"
+  // MSVC-SAME:      name: "<lambda_1>"
+  // MSVC-SAME:      identifier: ".?AV<lambda_1>@?0??main@@9@"
   // MSVC-SAME:      )
 
   return 0;

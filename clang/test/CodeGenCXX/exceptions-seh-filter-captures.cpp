@@ -98,17 +98,17 @@ void test_lambda() {
   lambda();
 }
 
-// CHECK-LABEL: define internal void @"??R<lambda_0>@?0??test_lambda@@YAXXZ@QEBA@XZ"(ptr {{[^,]*}} %this)
+// CHECK-LABEL: define internal void @"??R<lambda_1>@?0??test_lambda@@YAXXZ@QEBA@XZ"(ptr {{[^,]*}} %this)
 // CHECK: @llvm.localescape(ptr %[[this_addr:[^, ]*]], ptr %[[l2_addr:[^, ]*]])
 // CHECK: store ptr %this, ptr %[[this_addr]], align 8
 // CHECK: store i32 42, ptr %[[l2_addr]], align 4
 // CHECK: invoke void @might_crash()
 
-// CHECK-LABEL: define internal noundef i32 @"?filt$0@0@?R<lambda_0>@?0??test_lambda@@YAXXZ@"(ptr noundef %exception_pointers, ptr noundef %frame_pointer)
-// CHECK: %[[fp:[^ ]*]] = call ptr @llvm.eh.recoverfp(ptr @"??R<lambda_0>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %frame_pointer)
-// CHECK: %[[this_i8:[^ ]*]] = call ptr @llvm.localrecover(ptr @"??R<lambda_0>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %[[fp]], i32 0)
+// CHECK-LABEL: define internal noundef i32 @"?filt$0@0@?R<lambda_1>@?0??test_lambda@@YAXXZ@"(ptr noundef %exception_pointers, ptr noundef %frame_pointer)
+// CHECK: %[[fp:[^ ]*]] = call ptr @llvm.eh.recoverfp(ptr @"??R<lambda_1>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %frame_pointer)
+// CHECK: %[[this_i8:[^ ]*]] = call ptr @llvm.localrecover(ptr @"??R<lambda_1>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %[[fp]], i32 0)
 // CHECK: %[[this:[^ ]*]] = load ptr, ptr %[[this_i8]], align 8
-// CHECK: %[[l2_i8:[^ ]*]] = call ptr @llvm.localrecover(ptr @"??R<lambda_0>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %[[fp]], i32 1)
+// CHECK: %[[l2_i8:[^ ]*]] = call ptr @llvm.localrecover(ptr @"??R<lambda_1>@?0??test_lambda@@YAXXZ@QEBA@XZ", ptr %[[fp]], i32 1)
 // CHECK: %[[l2:[^ ]*]] = load i32, ptr %[[l2_i8]]
 // CHECK: %[[l1_ref_ptr:[^ ]*]] = getelementptr inbounds nuw %class.anon, ptr %[[this]], i32 0, i32 0
 // CHECK: %[[l1_ref:[^ ]*]] = load ptr, ptr %[[l1_ref_ptr]]

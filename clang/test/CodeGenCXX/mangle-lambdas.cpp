@@ -72,8 +72,8 @@ void test_S(S s) {
   // the lambdas in the default arguments of g() won't be seen by
   // multiple translation units. We check them mainly to ensure that they don't 
   // get the special mangling for lambdas in in-class default arguments.
-  // CHECK: call noundef i32 @"_ZNK1S3$_0clEv"
-  // CHECK-NEXT: call noundef i32 @"_ZNK1S3$_1clEv"
+  // CHECK: call noundef i32 @_ZNK1SUlvE_clEv
+  // CHECK-NEXT: call noundef i32 @_ZNK1SUlvE0_clEv
   // CHECK-NEXT: call void @_ZN1S1gEi
   s.g();
 
@@ -87,9 +87,9 @@ void test_S(S s) {
 // CHECK: ret i32 2
 // CHECK-LABEL: define linkonce_odr noundef i32 @_ZZN1S1fEiiEd_NKUlvE_clEv
 // CHECK: ret i32 3
-// CHECK-LABEL: define internal noundef i32 @"_ZNK1S3$_0clEv"
+// CHECK-LABEL: define internal noundef i32 @_ZNK1SUlvE_clEv
 // CHECK: ret i32 1
-// CHECK-LABEL: define internal noundef i32 @"_ZNK1S3$_1clEv"
+// CHECK-LABEL: define internal noundef i32 @_ZNK1SUlvE0_clEv
 // CHECK: ret i32 2
 
 template<typename T>
@@ -168,8 +168,8 @@ template float StaticMembers<float>::z;
 template int (*StaticMembers<float>::f)();
 
 // CHECK-LABEL: define internal void @__cxx_global_var_init
-// CHECK: call noundef i32 @"_ZNK13StaticMembersIdE3$_2clEv"
-// CHECK-LABEL: define internal noundef i32 @"_ZNK13StaticMembersIdE3$_2clEv"
+// CHECK: call noundef i32 @_ZNK13StaticMembersIdEUlvE_clEv
+// CHECK-LABEL: define internal noundef i32 @_ZNK13StaticMembersIdEUlvE_clEv
 // CHECK: ret i32 42
 template<> double StaticMembers<double>::z = []{return side_effect(), 42; }();
 
@@ -178,7 +178,7 @@ void func_template(T = []{ return T(); }());
 
 // CHECK-LABEL: define{{.*}} void @_Z17use_func_templatev()
 void use_func_template() {
-  // CHECK: call noundef i32 @"_ZZ13func_templateIiEvT_ENK3$_0clEv"
+  // CHECK: call noundef i32 @_ZZ13func_templateIiEvT_ENKUlvE_clEv
   func_template<int>();
 }
 
@@ -218,12 +218,12 @@ void ft1(int = [](int p = [] { return side_effect(), 42; } ()) {
                  return p;
                } ());
 void test_ft1() {
-  // CHECK: call noundef i32 @"_ZZZ3ft1IiEviENK3$_0clEiEd_NKUlvE_clEv"
-  // CHECK: call noundef i32 @"_ZZ3ft1IiEviENK3$_0clEi"
+  // CHECK: call noundef i32 @_ZZZ3ft1IiEviENKUliE_clEiEd_NKUlvE_clEv
+  // CHECK: call noundef i32 @_ZZ3ft1IiEviENKUliE_clEi
   ft1();
 }
-// CHECK-LABEL: define internal noundef i32 @"_ZZ3ft1IiEviENK3$_0clEi"
-// CHECK-LABEL: define internal noundef i32 @"_ZZZ3ft1IiEviENK3$_0clEiEd_NKUlvE_clEv"
+// CHECK-LABEL: define internal noundef i32 @_ZZ3ft1IiEviENKUliE_clEi
+// CHECK-LABEL: define internal noundef i32 @_ZZZ3ft1IiEviENKUliE_clEiEd_NKUlvE_clEv
 
 struct c1 {
   template<typename = int>
@@ -275,8 +275,8 @@ void ft3() {
   f();
 }
 template void ft3<int>();
-// CHECK: call noundef i32 @"_ZZ1fiENK3$_0clEv"
-// CHECK-LABEL: define internal noundef i32 @"_ZZ1fiENK3$_0clEv"
+// CHECK: call noundef i32 @_ZZ1fiENKUlvE_clEv
+// CHECK-LABEL: define internal noundef i32 @_ZZ1fiENKUlvE_clEv
 
 template<typename>
 void ft4() {

@@ -294,8 +294,8 @@ int PR26105() {
   auto add = [](int x) { return ([x](int y) { return x + y; }); };
   return add(3)(4);
 }
-// CHECK-DAG: @"??R<lambda_0>@?0??PR26105@@YAHXZ@QBE@H@Z"
-// CHECK-DAG: @"??R<lambda_1>@?0???R<lambda_0>@?0??PR26105@@YAHXZ@QBE@H@Z@QBE@H@Z"
+// CHECK-DAG: @"??R<lambda_1>@?0??PR26105@@YAHXZ@QBE@H@Z"
+// CHECK-DAG: @"??R<lambda_2>@?0???R<lambda_1>@?0??PR26105@@YAHXZ@QBE@H@Z@QBE@H@Z"
 
 int __unaligned * unaligned_foo1() { return 0; }
 int __unaligned * __unaligned * unaligned_foo2() { return 0; }

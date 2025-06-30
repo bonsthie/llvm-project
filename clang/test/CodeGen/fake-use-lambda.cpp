@@ -24,17 +24,17 @@ int func(int param) {
 
 // We are looking for the first lambda's call operator, which should contain
 // 2 fake uses, one for 'b' and one for its 'this' pointer (in that order).
-// The mangled function name contains a $_0, followed by 'cl'.
+// The mangled function name contains a Ul, followed by '_cl'.
 // This lambda is an orphaned lambda, i.e. one without lexical parent.
 //
-// CHECK-LABEL: define internal {{.+\"_Z.+\$_0.*cl.*\"}}
+// CHECK-LABEL: define internal {{.+_Z.+Ul.*_cl.*}}
 // CHECK-NOT:   ret
 // CHECK:       fake.use(i32
 // CHECK-NOT:   ret
 // CHECK:       fake.use(ptr
 
 // The second lambda. We are looking for 3 fake uses.
-// CHECK-LABEL: define internal {{.+\"_Z.+\$_0.*cl.*\"}}
+// CHECK-LABEL: define internal {{.+_Z.+Ul.*_cl.*}}
 // CHECK-NOT:   ret
 // CHECK:       fake.use(i32
 // CHECK-NOT:   ret
