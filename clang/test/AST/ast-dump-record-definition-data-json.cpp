@@ -221,7 +221,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:     }
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "name": "operator()",
-// CHECK-NEXT:    "mangledName": "_ZZ1fvENK3$_0clEv",
+// CHECK-NEXT:    "mangledName": "_ZZ1fvENKUlvE_clEv",
 // CHECK-NEXT:    "type": {
 // CHECK-NEXT:     "qualType": "void () const"
 // CHECK-NEXT:    },
@@ -268,7 +268,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "isImplicit": true,
 // CHECK-NEXT:    "name": "operator void (*)()",
-// CHECK-NEXT:    "mangledName": "_ZZ1fvENK3$_0cvPFvvEEv",
+// CHECK-NEXT:    "mangledName": "_ZZ1fvENKUlvE_cvPFvvEEv",
 // CHECK-NEXT:    "type": {
 // CHECK-NEXT:     "qualType": "void (*() const noexcept)()"
 // CHECK-NEXT:    },
@@ -297,7 +297,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:    },
 // CHECK-NEXT:    "isImplicit": true,
 // CHECK-NEXT:    "name": "__invoke",
-// CHECK-NEXT:    "mangledName": "_ZZ1fvEN3$_08__invokeEv",
+// CHECK-NEXT:    "mangledName": "_ZZ1fvENUlvE_8__invokeEv",
 // CHECK-NEXT:    "type": {
 // CHECK-NEXT:     "qualType": "void ()"
 // CHECK-NEXT:    },
@@ -327,7 +327,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:    "isImplicit": true,
 // CHECK-NEXT:    "isReferenced": true,
 // CHECK-NEXT:    "name": "~(lambda at {{.*}}:4:29)",
-// CHECK-NEXT:    "mangledName": "_ZZ1fvEN3$_0D1Ev",
+// CHECK-NEXT:    "mangledName": "_ZZ1fvENUlvE_D1Ev",
 // CHECK-NEXT:    "type": {
 // CHECK-NEXT:     "qualType": "void () noexcept"
 // CHECK-NEXT:    },
@@ -713,7 +713,7 @@ struct DoesNotAllowConstDefaultInit {
 // CHECK-NEXT:    "isImplicit": true,
 // CHECK-NEXT:    "isReferenced": true,
 // CHECK-NEXT:    "name": "~(lambda at {{.*}}:5:26)",
-// CHECK-NEXT:    "mangledName": "_ZZ1fvEN3$_1D1Ev",
+// CHECK-NEXT:    "mangledName": "_ZZ1fvENUlT_E_D1Ev",
 // CHECK-NEXT:    "type": {
 // CHECK-NEXT:     "qualType": "void () noexcept"
 // CHECK-NEXT:    },

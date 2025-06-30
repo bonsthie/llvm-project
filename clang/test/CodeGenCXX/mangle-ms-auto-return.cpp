@@ -227,19 +227,19 @@ void test_lambda() {
 
   auto lambdaGenericIntIntRetAuto = [](auto a) { return a; };
   lambdaGenericIntIntRetAuto(0);
-  // CHECK: call {{.*}} @"??$?RH@<lambda_0>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@H@Z"
+  // CHECK: call {{.*}} @"??$?RH@<lambda_3>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@H@Z"
 
   auto lambdaRetTrailingAuto = []() -> auto { return 0; };
   lambdaRetTrailingAuto();
-  // CHECK: call {{.*}} @"??R<lambda_3>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@XZ"
+  // CHECK: call {{.*}} @"??R<lambda_4>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@XZ"
 
   auto lambdaRetTrailingDecltypeAuto = []() -> decltype(auto) { return 0; };
   lambdaRetTrailingDecltypeAuto();
-  // CHECK: call {{.*}} @"??R<lambda_4>@?0??test_lambda@@YAXXZ@QEBA?A?<decltype-auto>@@XZ"
+  // CHECK: call {{.*}} @"??R<lambda_5>@?0??test_lambda@@YAXXZ@QEBA?A?<decltype-auto>@@XZ"
 
   auto lambdaRetTrailingRefCollapse = [](int x) -> auto&& { return x; };
   lambdaRetTrailingRefCollapse(i);
-  // CHECK: call {{.*}} @"??R<lambda_5>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@H@Z"
+  // CHECK: call {{.*}} @"??R<lambda_6>@?0??test_lambda@@YAXXZ@QEBA?A?<auto>@@H@Z"
 }
 
 auto TestTrailingInt() -> int {

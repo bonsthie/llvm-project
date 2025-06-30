@@ -1,3 +1,4 @@
+// TODO me go back problem : Ut are not the same in 98 and 11
 // RUN: %clang_cc1 -std=c++98 -emit-llvm %s -o - -triple=x86_64-apple-darwin10 | FileCheck %s
 // RUN: %clang_cc1 -std=c++11 -emit-llvm %s -o - -triple=x86_64-apple-darwin10 | FileCheck %s
 
@@ -83,7 +84,7 @@ template <class T> struct Test8 {
 template <class T> void make_test8(T value) { Test8<T> t(value); }
 void test8() { make_test8(T8); }
 
-// CHECK-LABEL: define internal void @"_ZNV3$_35test9Ev"(
+// CHECK-LABEL: define internal void @_ZNVUt4_5test9Ev(
 typedef volatile struct {
   void test9() volatile {}
 } Test9;
@@ -92,4 +93,4 @@ void test9() {
   a.test9();
 }
 
-// CHECK-LABEL: define internal void @"_ZN5Test8I3$_2EC1ES0_"(
+// CHECK-LABEL: define internal void @_ZN5Test8IUt3_EC1ES0_(

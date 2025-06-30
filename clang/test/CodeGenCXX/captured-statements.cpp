@@ -62,7 +62,7 @@ void test2(int x) {
   }();
 
   // CHECK-2-LABEL: define {{.*}}void @_Z5test2i
-  // CHECK-2:   call {{.*}} @[[Lambda:["$\w]+]]
+  // CHECK-2:   call {{.*}} @[[Lambda:[_$\w]+]]
   //
   // CHECK-2: define internal {{.*}} @[[Lambda]]
   // CHECK-2:   call void @[[HelperName:["$_A-Za-z0-9]+]](ptr

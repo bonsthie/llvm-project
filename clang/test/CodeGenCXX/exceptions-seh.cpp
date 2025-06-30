@@ -116,7 +116,7 @@ void use_seh_in_lambda() {
 // NOCXX-NOT: invoke
 // NOCXX: ret void
 
-// CHECK-LABEL: define internal void @"??R<lambda_0>@?0??use_seh_in_lambda@@YAXXZ@QEBA@XZ"(ptr {{[^,]*}} %this)
+// CHECK-LABEL: define internal void @"??R<lambda_1>@?0??use_seh_in_lambda@@YAXXZ@QEBA@XZ"(ptr {{[^,]*}} %this)
 // CXXEH-SAME:  personality ptr @__C_specific_handler
 // CHECK: invoke void @might_throw() #[[NOINLINE]]
 // CHECK: catchpad
