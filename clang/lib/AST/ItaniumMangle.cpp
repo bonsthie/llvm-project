@@ -1640,13 +1640,9 @@ void CXXNameMangler::mangleUnqualifiedName(
       UnsignedOrNone DeviceNumber =
           Context.getDiscriminatorOverride()(Context.getASTContext(), Record);
 
-      // If we have a device-number via the discriminator, use that to mangle
-      // the lambda, otherwise use the typical lambda-mangling-number. In either
-      // case, a '0' should be mangled as a normal unnamed class instead of as a
-      // lambda.
-      if (Record->isLambda() &&
-          ((DeviceNumber && *DeviceNumber > 0) ||
-           (!DeviceNumber && Record->getLambdaManglingNumber() > 0))) {
+      if (Record->isLambda()) {
+		assert(!DeviceNumber && Record->getLambdaManglingNumber() > 0 &&
+			   "Lambda mangling number should be already set");
         assert(!AdditionalAbiTags &&
                "Lambda type cannot have additional abi tags");
         mangleLambda(Record);
@@ -1654,32 +1650,13 @@ void CXXNameMangler::mangleUnqualifiedName(
       }
     }
 
-    if (TD->isExternallyVisible()) {
-      unsigned UnnamedMangle =
-          getASTContext().getManglingNumber(TD, Context.isAux());
-      Out << "Ut";
-      if (UnnamedMangle > 1)
-        Out << UnnamedMangle - 2;
-      Out << '_';
-      writeAbiTags(TD, AdditionalAbiTags);
-      break;
-    }
-
-    // Get a unique id for the anonymous struct. If it is not a real output
-    // ID doesn't matter so use fake one.
-    unsigned AnonStructId =
-        NullOut ? 0
-                : Context.getAnonymousStructId(TD, dyn_cast<FunctionDecl>(DC));
-
-    // Mangle it as a source name in the form
-    // [n] $_<id>
-    // where n is the length of the string.
-    SmallString<8> Str;
-    Str += "$_";
-    Str += llvm::utostr(AnonStructId);
-
-    Out << Str.size();
-    Out << Str;
+    unsigned UnnamedMangle =
+        getASTContext().getManglingNumber(TD, Context.isAux());
+    Out << "Ut";
+    if (UnnamedMangle > 1)
+      Out << UnnamedMangle - 2;
+    Out << '_';
+    writeAbiTags(TD, AdditionalAbiTags);
     break;
   }
 
