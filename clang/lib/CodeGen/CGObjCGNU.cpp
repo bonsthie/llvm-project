@@ -2795,9 +2795,13 @@ CGObjCGNU::GenerateMessageSendSuper(CodeGenFunction &CGF,
         ReceiverClass = MetaClassPtrAlias;
       } else {
         if (!ClassPtrAlias) {
+		  std::string ClassName = Class->getNameAsString();
+		  llvm::GlobalValue *RealClassGV = TheModule.getNamedValue("_OBJC_CLASS_" + ClassName);
+		  assert(RealClassGV && "must have already emitted the class object");
+
           ClassPtrAlias = llvm::GlobalAlias::create(
               IdElemTy, 0, llvm::GlobalValue::InternalLinkage,
-              ".objc_class_ref" + Class->getNameAsString(), &TheModule);
+              ".objc_class_ref" + ClassName, RealClassGV, &TheModule);
         }
         ReceiverClass = ClassPtrAlias;
       }
