@@ -133,6 +133,11 @@ clang_tablegen(BuiltinTemplates.inc -gen-clang-builtin-templates
   SOURCE BuiltinTemplates.td
   TARGET ClangBuiltinTemplates)
 
+clang_tablegen(BuiltinsH2BLB.inc -gen-clang-builtins
+	SOURCE BuiltinsH2BLB.td
+	TARGET ClangBuiltinsH2BLB
+)
+
 # ARM NEON and MVE
 clang_tablegen(arm_neon.inc -gen-arm-neon-sema
   SOURCE arm_neon.td

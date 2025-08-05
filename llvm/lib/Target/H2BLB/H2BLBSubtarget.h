@@ -3,6 +3,7 @@
 
 #include "H2BLBISelLowering.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/CodeGen/TargetRegisterInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 namespace llvm {
 
@@ -13,12 +14,14 @@ class H2BLBSubtarget : public TargetSubtargetInfo {
   H2BLBTargetLowering TLInfo;
 
 public:
-  H2BLBSubtarget(const Triple &&TT, StringRef CPU, StringRef FS,
+  H2BLBSubtarget(const Triple &TT, StringRef CPU, StringRef FS,
                  const TargetMachine &TM);
 
   const H2BLBTargetLowering *getTargetLowering() const override {
     return &TLInfo;
   }
+
+	const TargetRegisterInfo *getRegisterInfo() const override { return nullptr; }
 
 private:
   virtual void anchor();

@@ -19,6 +19,7 @@
 #include "llvm/IR/IntrinsicsAMDGPU.h"
 #include "llvm/IR/IntrinsicsARM.h"
 #include "llvm/IR/IntrinsicsBPF.h"
+#include "llvm/IR/IntrinsicsH2BLB.h"
 #include "llvm/IR/IntrinsicsHexagon.h"
 #include "llvm/IR/IntrinsicsLoongArch.h"
 #include "llvm/IR/IntrinsicsMips.h"
@@ -615,7 +616,7 @@ FunctionType *Intrinsic::getType(LLVMContext &Context, ID id,
   return FunctionType::get(ResultTy, ArgTys, false);
 }
 
-bool Intrinsic::isOverloaded(ID id) {
+bool Intrinsic::isOverloaded(ID id){
 #define GET_INTRINSIC_OVERLOAD_TABLE
 #include "llvm/IR/IntrinsicImpl.inc"
 #undef GET_INTRINSIC_OVERLOAD_TABLE

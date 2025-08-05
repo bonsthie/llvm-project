@@ -14,7 +14,8 @@ class LLVM_LIBRARY_VISIBILITY H2BLBTargetInfo : public TargetInfo {
 public:
   H2BLBTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
       : TargetInfo(Triple) {
-    resetDataLayout( "e-p:16:32:32-n16:32-i1:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-v32:32:32");
+    resetDataLayout("e-p:16:32:32-n16:32-i1:8:8-i16:16:16-i32:32:32-i64:64:64-"
+                    "f32:32:32-v32:32:32");
   }
 
   /// Appends the target-specific \#define values for this

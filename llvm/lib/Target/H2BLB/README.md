@@ -68,12 +68,6 @@ Triple::getArchTypeForLLVMName(StringRef Name) {
           .Case("h2blb", h2blb)
 <snip>
 
-<snip>
-Triple::getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
-
-  case llvm::Triple::h2blb:
-    return 16;
-<snip>
 
 ```
 * add the Target to the `clang/lib/Basic/Targets/` H2BLB.{cpp/.h}
@@ -87,3 +81,11 @@ case llvm::Triple::h2blb:
 <snip>
 
 ```
+
+* add the intrinsic in `llvm/include/llvm/IR/IntrinsicH2BLB.td`
+* add the `IntrinsicH2BLB.td` in `llvm/include/llvm/IR/Intrinsic.td`
+* add the `IntrinsicH2BLB.td` in the cmake for tablegen `tablegen(LLVM IntrinsicsH2BLB.h -gen-intrinsic-enums -intrinsic-prefix=h2blb)`
+* include `llvm/IR/IntrinsicsH2BLB.h` to Intrinsics.cpp
+* create the `clang/include/clang/Basic/BuiltinsH2BLB.td`
+* add it to the Basic CMakeList.txt `-gen-clang-builtins`
+* add the builtin info to the `Targets/H2BLB.cpp`

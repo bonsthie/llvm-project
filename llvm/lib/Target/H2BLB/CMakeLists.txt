@@ -9,10 +9,16 @@ add_llvm_target(H2BLBCodeGen
 	LINK_COMPONENTS
 	H2BLBDesc
 	H2BLBInfo
-	CodeGen
-	Target
-	MC
-	Support
+    Analysis
+    CodeGen
+    Core
+    MC
+    Passes
+    SelectionDAG
+    Support
+    Target
+    TargetParser
+    TransformUtils
 
 # makes sure this target is added to the LLVM created by add_llvm_component_group
 	ADD_TO_COMPONENT

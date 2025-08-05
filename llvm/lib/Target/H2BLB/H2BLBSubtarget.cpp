@@ -3,7 +3,10 @@
 
 using namespace llvm;
 
-H2BLBSubtarget::H2BLBSubtarget(const Triple &&TT, StringRef CPU, StringRef FS,
+// Pin the vtable to this file.
+void H2BLBSubtarget::anchor() {}
+
+H2BLBSubtarget::H2BLBSubtarget(const Triple &TT, StringRef CPU, StringRef FS,
                                const TargetMachine &TM)
     : TargetSubtargetInfo(TT, CPU, /*TuneCPU=*/"", FS, /*PN=*/{}, /*PF=*/{},
                           /*PD=*/{},
