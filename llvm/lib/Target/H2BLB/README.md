@@ -3,6 +3,15 @@ this follow the chapter 9 to 21 `H2BLB` backend creation
 to use it you need :
 * add the `H2BLB` to the target list
 * put this folder in `llvm/lib/Target/H2BLB`
+* add the H2BLB in the `TargetParser/Triple.h`
+```cpp
+<snip>
+class Triple {
+    h2blb, 
+}
+<snip>
+
+```
 * add the H2BLB in the `TargetParser/Triple.cpp`
 ```cpp
 static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
@@ -30,4 +39,51 @@ Triple Triple::get32BitArchVariant() const {
             // This is already in 32-bit
             return T;
 <snip>
+
+<snip>
+Triple::get64BitArchVariant() const {
+  case Triple::h2blb:
+    T.setArch(UnknownArch);
+    break;
+<snip>
+
+<snip>
+Triple::getArchTypeName(ArchType Kind) {
+     case h2blb:          return "h2blb";
+}
+<snip>
+
+<snip>
+Triple::getArchTypePrefix(ArchType Kind) {
+     case h2blb:          return "h2blb";
+<snip>
+
+<snip>
+Triple::getArchTypeForLLVMName(StringRef Name) {
+          .Case("h2blb", h2blb)
+<snip>
+
+<snip>
+ static Triple::ArchType parseArch(StringRef ArchName) {
+          .Case("h2blb", h2blb)
+<snip>
+
+<snip>
+Triple::getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
+
+  case llvm::Triple::h2blb:
+    return 16;
+<snip>
+
+```
+* add the Target to the `clang/lib/Basic/Targets/` H2BLB.{cpp/.h}
+* add them to the cmakelist of the folder
+* update `clang/lib/Basic/Targets.cpp`
+
+```cpp
+<snip>
+case llvm::Triple::h2blb:
+    return std::make_unique<H2BLBTargetInfo>(Triple, Opts);
+<snip>
+
 ```

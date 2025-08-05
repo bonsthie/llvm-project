@@ -616,6 +616,7 @@ static Triple::ArchType parseArch(StringRef ArchName) {
                 .Case("riscv64", Triple::riscv64)
                 .Case("riscv32be", Triple::riscv32be)
                 .Case("riscv64be", Triple::riscv64be)
+                .Case("h2blb", Triple::h2blb)
                 .Case("hexagon", Triple::hexagon)
                 .Cases("s390x", "systemz", Triple::systemz)
                 .Case("sparc", Triple::sparc)
