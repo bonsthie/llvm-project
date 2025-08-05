@@ -14,19 +14,7 @@ class LLVM_LIBRARY_VISIBILITY H2BLBTargetInfo : public TargetInfo {
 public:
   H2BLBTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
       : TargetInfo(Triple) {
-    resetDataLayout(
-        // Little-endian.
-        "e-"
-        // Pointer size is 16-bit and the alignment matches.
-        "p:16:16:16-"
-        // Supports natively 16-bit and 32-bit integer.
-        "n16:32-"
-        // i32 are aligned on 32, i16 on 16 and i1 on 8.
-        "i32:32:32-i16:16:16-i1:8:8-"
-        // f32 aligned on 32-bit.
-        "f32:32:32-"
-        // v32 aligned on 32-bit.
-        "v32:32:32");
+    resetDataLayout( "e-p:16:32:32-n16:32-i1:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-v32:32:32");
   }
 
   /// Appends the target-specific \#define values for this

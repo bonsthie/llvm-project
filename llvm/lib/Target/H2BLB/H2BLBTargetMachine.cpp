@@ -4,8 +4,7 @@
 #include "llvm/Support/Compiler.h"
 
 // look at chapter 7 to understand this
-static const char *H2BLBDataLayoutStr =
-    "e-p:16:16:16-n16:32-i32:32:32-i16:16:16-i1:8:8-f32:32:32-v32:32:32";
+static const char *H2BLBDataLayoutStr = "e-p:16:32:32-n16:32-i1:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-v32:32:32";
 
 H2BLBTargetMachine::H2BLBTargetMachine(const Target &T,  //
                                        const Triple &TT, //
@@ -23,5 +22,5 @@ H2BLBTargetMachine::H2BLBTargetMachine(const Target &T,  //
 H2BLBTargetMachine::~H2BLBTargetMachine() = default;
 
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeH2BLBTarget() {
-	RegisterTargetMachine<H2BLBTargetMachine> X(llvm::getTheH2BLBTarget());
+  RegisterTargetMachine<H2BLBTargetMachine> X(llvm::getTheH2BLBTarget());
 }
