@@ -14,6 +14,7 @@ namespace llvm {
 
 class H2BLBTargetMachine : public CodeGenTargetMachineImpl {
   mutable std::unique_ptr<H2BLBSubtarget> SubtargetSingleton;
+  std::unique_ptr<TargetLoweringObjectFile> TLOF;
 
 public:
   H2BLBTargetMachine(
@@ -34,21 +35,23 @@ public:
 
   const H2BLBSubtarget *getSubtargetImpl(const Function &F) const override;
   TargetTransformInfo getTargetTransformInfo(const Function &F) const override;
+  TargetLoweringObjectFile *getObjFileLowering() const override;
 
   void registerPassBuilderCallbacks(PassBuilder &PB) override;
 
   TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 };
 
-
 // lass that handle what action should be done on the code with this arch
-// * add pass to the ir 
-// * etc..
+// * add pass to the ir
+// * inst selector
+// * etc...
 class H2BLBPassConfig : public TargetPassConfig {
 public:
   H2BLBPassConfig(TargetMachine &TM, PassManagerBase &PM);
 
-	void addIRPasses() override;
+  void addIRPasses() override;
+  bool addInstSelector() override;
 };
 
 } // namespace llvm

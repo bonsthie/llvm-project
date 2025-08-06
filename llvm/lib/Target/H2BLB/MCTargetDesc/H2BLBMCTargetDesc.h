@@ -1,0 +1,12 @@
+#ifndef LLVM_LIB_TARGET_H2BLB_H2BLBMCTARGETDESC_H
+#define LLVM_LIB_TARGET_H2BLB_H2BLBMCTARGETDESC_H
+
+namespace llvm {
+
+
+} // namespace llvm
+
+#define GET_SUBTARGETINFO_ENUM
+#include "H2BLBGenSubtargetInfo.inc"
+
+#endif //  LLVM_LIB_TARGET_H2BLB_H2BLBMCTARGETDESC_H
