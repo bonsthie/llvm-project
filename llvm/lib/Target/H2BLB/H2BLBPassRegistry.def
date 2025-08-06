@@ -1,0 +1,7 @@
+
+#ifndef FUNCTION_PASS
+#define FUNCTION_PASS(NAME, CREATE_PASS)
+#endif
+FUNCTION_PASS("h2blb-simple-cst-prop",
+              H2BLBSimpleConstantPropagationNewPass())
+#undef FUNCTION_PASS

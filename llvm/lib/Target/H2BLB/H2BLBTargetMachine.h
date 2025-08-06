@@ -2,7 +2,11 @@
 #define LLVM_LIB_TARGET_H2BLB_H2BLBTARGETMACHINE_H
 
 #include "H2BLBSubtarget.h"
+#include "llvm/Analysis/TargetTransformInfo.h"
 #include "llvm/CodeGen/CodeGenTargetMachineImpl.h"
+#include "llvm/CodeGen/TargetPassConfig.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/Target/TargetOptions.h"
 #include <optional>
 
@@ -29,6 +33,22 @@ public:
   ~H2BLBTargetMachine() override;
 
   const H2BLBSubtarget *getSubtargetImpl(const Function &F) const override;
+  TargetTransformInfo getTargetTransformInfo(const Function &F) const override;
+
+  void registerPassBuilderCallbacks(PassBuilder &PB) override;
+
+  TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
+};
+
+
+// lass that handle what action should be done on the code with this arch
+// * add pass to the ir 
+// * etc..
+class H2BLBPassConfig : public TargetPassConfig {
+public:
+  H2BLBPassConfig(TargetMachine &TM, PassManagerBase &PM);
+
+	void addIRPasses() override;
 };
 
 } // namespace llvm
