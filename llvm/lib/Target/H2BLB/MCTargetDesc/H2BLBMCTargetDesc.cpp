@@ -12,6 +12,13 @@ using namespace llvm;
 #define GET_SUBTARGETINFO_MC_DESC
 #include "H2BLBGenSubtargetInfo.inc"
 
+#define GET_REGINFO_MC_DESC
+#include "H2BLBGenRegisterInfo.inc"
+
+#define GET_INSTRINFO_MC_DESC
+#define GET_INSTRINFO_MC_HEKPERS
+#include "H2BLBGenInstrInfo.inc"
+
 static MCSubtargetInfo *
 createH2BLBMCSubtargetInfo(const Triple &TT, StringRef CPU, StringRef FS) {
   return createH2BLBMCSubtargetInfoImpl(TT, CPU, /*TuneCPU*/ CPU, FS);
@@ -19,11 +26,13 @@ createH2BLBMCSubtargetInfo(const Triple &TT, StringRef CPU, StringRef FS) {
 
 static MCRegisterInfo *createH2BLBMCRegisterInfo(const Triple &Triple) {
   MCRegisterInfo *X = new MCRegisterInfo();
+  InitH2BLBMCRegisterInfo(X, H2BLB::R7);
   return X;
 }
 
 static MCInstrInfo *createH2BLBMCInstrInfo() {
   MCInstrInfo *X = new MCInstrInfo();
+  InitH2BLBMCInstrInfo(X);
   return X;
 }
 
