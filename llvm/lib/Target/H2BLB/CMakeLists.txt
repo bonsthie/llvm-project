@@ -5,7 +5,13 @@ set(LLVM_TARGET_DEFINITIONS H2BLB.td)
 tablegen(LLVM H2BLBGenSubtargetInfo.inc -gen-subtarget)
 tablegen(LLVM H2BLBGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM H2BLBGenInstrInfo.inc -gen-instr-info)
-tablegen(LLVM H2BLBInstrFormats.inc -gen-emitter)
+
+# MCInstr to .s
+tablegen(LLVM H2BLBGenAsmWriter.inc -gen-asm-writer)
+# .s to MCInst
+tablegen(LLVM H2BLBGenAsmMatcher.inc -gen-asm-matcher)
+# Encoding
+tablegen(LLVM H2BLBGenMCCodeEmitter.inc -gen-emitter)
 
 
 add_public_tablegen_target(H2BLBCommonTableGen)
@@ -26,6 +32,7 @@ add_llvm_target(H2BLBCodeGen
 	LINK_COMPONENTS
 	H2BLBDesc
 	H2BLBInfo
+	H2BLBAsmParser
     Analysis
     CodeGen
     Core
@@ -43,4 +50,5 @@ add_llvm_target(H2BLBCodeGen
 )
 
 add_subdirectory(MCTargetDesc)
+add_subdirectory(AsmParser)
 add_subdirectory(TargetInfo)

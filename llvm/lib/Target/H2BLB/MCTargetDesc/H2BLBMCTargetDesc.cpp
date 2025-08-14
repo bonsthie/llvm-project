@@ -1,7 +1,12 @@
 #include "H2BLBMCTargetDesc.h"
+#include "H2BLBInstPrinter.h"
 #include "H2BLBMCAsmInfo.h"
+#include "H2BLBMCCodeEmitter.h"
 #include "TargetInfo/H2BLBTargetInfo.h"
+
+#include "llvm/MC/MCAsmInfo.h"
 #include "llvm/MC/MCInstrInfo.h"
+#include "llvm/MC/MCRegister.h"
 #include "llvm/MC/MCRegisterInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/MC/TargetRegistry.h"
@@ -36,6 +41,11 @@ static MCInstrInfo *createH2BLBMCInstrInfo() {
   return X;
 }
 
+static MCCodeEmitter *createH2BLBMCCodeEmitter(const MCInstrInfo &MCII,
+                                               MCContext &MCCtxt) {
+  return new H2BLBMCCodeEmitter(MCCtxt);
+}
+
 static MCAsmInfo *createH2BLBMCAsmInfo(const MCRegisterInfo &MRI,
                                        const Triple &TheTriple,
                                        const MCTargetOptions &Options) {
@@ -47,6 +57,16 @@ static MCAsmInfo *createH2BLBMCAsmInfo(const MCRegisterInfo &MRI,
   else
     report_fatal_error("Binary format not supported");
   return MAI;
+}
+
+static MCInstPrinter *createH2BLBMCInstPrinter(const Triple &T,
+                                               unsigned SyntaxVariant,
+                                               const MCAsmInfo &MAI,
+                                               const MCInstrInfo &MII,
+                                               const MCRegisterInfo &MRI) {
+  if (SyntaxVariant == 0)
+    return new H2BLBInstPrinter(MAI, MII, MRI);
+  return nullptr;
 }
 
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeH2BLBTargetMC() {
@@ -61,4 +81,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeH2BLBTargetMC() {
   TargetRegistry::RegisterMCInstrInfo(TheTarget, createH2BLBMCInstrInfo);
 
   TargetRegistry::RegisterMCRegInfo(TheTarget, createH2BLBMCRegisterInfo);
+
+  TargetRegistry::RegisterMCInstPrinter(TheTarget, createH2BLBMCInstPrinter);
+
+  TargetRegistry::RegisterMCCodeEmitter(TheTarget,
+                                        createH2BLBMCCodeEmitter);
 }
