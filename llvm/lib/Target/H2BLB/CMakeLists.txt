@@ -13,6 +13,10 @@ tablegen(LLVM H2BLBGenAsmMatcher.inc -gen-asm-matcher)
 # Encoding
 tablegen(LLVM H2BLBGenMCCodeEmitter.inc -gen-emitter)
 
+# ISel 
+tablegen(LLVM H2BLBGenDAGISel.inc -gen-dag-isel)
+tablegen(LLVM H2BLBGenFastISel.inc -gen-fast-isel)
+
 
 add_public_tablegen_target(H2BLBCommonTableGen)
 
@@ -27,15 +31,24 @@ add_llvm_target(H2BLBCodeGen
 	H2BLBRegisterInfo.cpp
 	H2BLBInstrInfo.cpp
 	H2BLBFrameLowering.cpp
+	H2BLBAsmPrinter.cpp
+	H2BLBIselDagToDag.cpp
+	H2BLBFastIsel.cpp
+
+	GISel/H2BLBCallLowering.cpp
 
 # target depends on the listed libraries
 	LINK_COMPONENTS
 	H2BLBDesc
 	H2BLBInfo
 	H2BLBAsmParser
+
     Analysis
+	AsmPrinter
     CodeGen
+	CodeGenTypes
     Core
+	GlobalISel
     MC
     Passes
     SelectionDAG

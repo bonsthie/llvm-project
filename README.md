@@ -1,5 +1,4 @@
 # H2BLB Custom Backend Learning
-
 This is a **toy architecture** created to learn how to build an LLVM backend.
 The main code of this backend is available in [llvm/lib/Target/H2BLB](llvm/lib/Target/H2BLB).
 
@@ -11,6 +10,10 @@ Currently, the backend provides:
 * **Register definitions and handling** (caller/callee saved, reserved registers)
 * **Instruction definitions and handling** (scheduling, properties, pseudo-instructions)
 * **Instruction encoding/mapping** for object file emission (via the MC layer)
+
+Intrinsic & Builtin Plumbing
+
+Upstream Integration
 
 # Main Classes Explained
 
@@ -37,6 +40,7 @@ Subtarget
 ├─ owns: TargetInstrInfo     (InstrInfo)
 ├─ owns: TargetRegisterInfo  (RegInfo)
 ├─ owns: TargetFrameLowering (FrameLowering)
+├─ owns: SelectionDAGTargetInfo (SelectionDAGInfo)
 └─ owns: TargetLowering      (IR → SelectionDAG lowering rules)
     └─ TargetLowering may query TTI for costs (TTI still owns nothing)
 
@@ -183,3 +187,7 @@ Encodes MCInst instructions into raw binary machine code.
 * Declares **registers and classes**
 * Defines aliases and reserved regs.
 * Produces `H2BLBGenRegisterInfo.inc`.
+
+todo
+
+gen-dag-isel

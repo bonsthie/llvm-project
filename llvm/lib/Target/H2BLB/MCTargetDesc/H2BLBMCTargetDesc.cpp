@@ -21,7 +21,8 @@ using namespace llvm;
 #include "H2BLBGenRegisterInfo.inc"
 
 #define GET_INSTRINFO_MC_DESC
-#define GET_INSTRINFO_MC_HEKPERS
+#define GET_INSTRINFO_MC_HELPERS
+#define ENABLE_INSTR_PREDICATE_VERIFIER
 #include "H2BLBGenInstrInfo.inc"
 
 static MCSubtargetInfo *

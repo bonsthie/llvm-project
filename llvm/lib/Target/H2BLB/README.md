@@ -87,5 +87,3 @@ case llvm::Triple::h2blb:
 * add the `IntrinsicH2BLB.td` in the cmake for tablegen `tablegen(LLVM IntrinsicsH2BLB.h -gen-intrinsic-enums -intrinsic-prefix=h2blb)`
 * include `llvm/IR/IntrinsicsH2BLB.h` to Intrinsics.cpp
 * create the `clang/include/clang/Basic/BuiltinsH2BLB.td`
-* add it to the Basic CMakeList.txt `-gen-clang-builtins`
-* add the builtin info to the `Targets/H2BLB.cpp`

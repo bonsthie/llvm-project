@@ -11,6 +11,9 @@ namespace llvm {
 class H2BLBTargetLowering : public TargetLowering {
 public:
   explicit H2BLBTargetLowering(const TargetMachine &TM);
+
+  FastISel *createFastISel(FunctionLoweringInfo &FuncInfo,
+                           const TargetLibraryInfo *LibInfo) const override;
 };
 
 } // namespace llvm

@@ -37,7 +37,7 @@ H2BLBTargetMachine::H2BLBTargetMachine(const Target &T,  //
                                RM ? *RM : Reloc::Static,
                                CM ? *CM : CodeModel::Small, OL),
       TLOF(createTLOF(getTargetTriple())) {
-	initAsmInfo();
+  initAsmInfo();
 }
 
 H2BLBTargetMachine::~H2BLBTargetMachine() = default;
@@ -100,7 +100,10 @@ void H2BLBPassConfig::addIRPasses() {
   }
 }
 
-bool H2BLBPassConfig::addInstSelector() { return false; }
+bool H2BLBPassConfig::addInstSelector() {
+  addPass(createH2BLBISelDAG(getH2BLBTargetMachine()));
+  return false;
+}
 
 ///
 /// EXTERN

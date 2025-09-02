@@ -1,6 +1,5 @@
 
 #include "H2BLBRegisterInfo.h"
-#include "H2BLBFrameLowering.h"
 #include "MCTargetDesc/H2BLBMCTargetDesc.h" // For the enum of the regclasses.
 #include "llvm/ADT/BitVector.h"
 #include "llvm/CodeGen/MachineFunction.h"
@@ -24,6 +23,12 @@ bool H2BLBRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI, int 
 	return false;
 }
 
+BitVector H2BLBRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+  BitVector Reserved(getNumRegs());
+  return Reserved;
+}
+
 Register H2BLBRegisterInfo::getFrameRegister(const MachineFunction &FM) const {
 	return {};
 }
+

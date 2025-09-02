@@ -50,6 +50,10 @@ class H2BLBPassConfig : public TargetPassConfig {
 public:
   H2BLBPassConfig(TargetMachine &TM, PassManagerBase &PM);
 
+  H2BLBTargetMachine &getH2BLBTargetMachine() const {
+    return getTM<H2BLBTargetMachine>();
+  }
+
   void addIRPasses() override;
   bool addInstSelector() override;
 };
