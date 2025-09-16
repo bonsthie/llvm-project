@@ -56,6 +56,10 @@ public:
 
   void addIRPasses() override;
   bool addInstSelector() override;
+  bool addIRTranslator() override;
+  bool addLegalizeMachineIR() override;
+  bool addRegBankSelect() override;
+  bool addGlobalInstructionSelect() override;
 };
 
 } // namespace llvm

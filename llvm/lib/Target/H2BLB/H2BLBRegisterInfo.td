@@ -20,17 +20,20 @@
 // use include "llvm/Target/Target.td"
 
 let Namespace = "H2BLB" in {
-
-class H2BLBReg<bits<16> enc, string name, list<Register> subregs = []> : Register<name> {
-	let HWEncoding = enc;
-	let SubRegs = subregs;
-
-	let CoveredBySubRegs = !if(!empty(subregs), false, true);
+class H2BLBReg<bits<16> enc, string name, list<Register> subregs = []>
+        : Register<name> {
+  let HWEncoding = enc;
+  let SubRegs = subregs;
+  // When the subregs are specified, they cover the full register.
+  // Note: Remember that !empty means the function empty, not "not empty".
+  let CoveredBySubRegs = !if(!empty(subregs), false, true);
 }
 
+// Subreg definitions.
 def sub_low16 : SubRegIndex<16>;
 def sub_high16 : SubRegIndex<16, 16>;
 
+// Register definitions.
 def R0 : H2BLBReg<0, "r0">;
 def R1 : H2BLBReg<1, "r1">;
 def R2 : H2BLBReg<2, "r2">;
@@ -41,19 +44,18 @@ def R6 : H2BLBReg<6, "r6">;
 def R7 : H2BLBReg<7, "r7">;
 
 let SubRegIndices = [sub_low16, sub_high16] in {
-	def D0 : H2BLBReg<0, "d0", [R0, R1]>;
-	def D1 : H2BLBReg<1, "d1", [R2, R3]>;
-	def D2 : H2BLBReg<2, "d2", [R4, R5]>;
-	def D3 : H2BLBReg<3, "d3", [R6, R7]>;
+  def D0 : H2BLBReg<0, "d0", [R0, R1]>;
+  def D1 : H2BLBReg<1, "d1", [R2, R3]>;
+  def D2 : H2BLBReg<2, "d2", [R4, R5]>;
+  def D3 : H2BLBReg<3, "d3", [R6, R7]>;
 }
 
-// stack reg it's in is own world
+// Stack register, it is its own thing.
 def SP : H2BLBReg<0, "sp">;
 
+// Register classes.
 def GPR16 : RegisterClass<"H2BLB", [i16], 16, (sequence "R%u", 0, 7)>;
-def GPR32 : RegisterClass<"H2BLB", [i32, v2i16, f32], 32, (sequence "R%u", 0, 3)>;
+def GPR32 : RegisterClass<"H2BLB", [i32,v2i16,f32], 32, (sequence "D%u", 0, 3)>;
 def OnlySP : RegisterClass<"H2BLB", [i16], 16, (add SP)>;
 def GPR16sp : RegisterClass<"H2BLB", [i16], 16, (add GPR16, OnlySP)>;
-
-
-} // end namespace H2BLB
+} // end namespace H2BLB.

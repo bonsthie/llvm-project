@@ -1,10 +1,13 @@
 #include "H2BLB.h"
+#include "MCTargetDesc/H2BLBMCTargetDesc.h"
 #include "H2BLBInstrInfo.h"
 #include "MCTargetDesc/H2BLBMCTargetDesc.h"
 #include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/CodeGen/FastISel.h"
 #include "llvm/CodeGen/FunctionLoweringInfo.h"
 
+// this part has been abandoned 
+// working on gisel only
 using namespace llvm;
 
 namespace llvm {
@@ -16,7 +19,7 @@ public:
 
   bool fastSelectInstruction(const Instruction *I) override;
 
-#include "H2BLBGenFastISel.inc"
+// #include "H2BLBGenFastISel.inc"
 
 private:
   bool selectRet(const Instruction &I);

@@ -1,7 +1,9 @@
 #include "H2BLB.h"
+#include "TargetInfo/H2BLBTargetInfo.h"
 #include "llvm/CodeGen/AsmPrinter.h"
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCStreamer.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Target/TargetMachine.h"
 #include <memory>
 
@@ -68,4 +70,11 @@ MCInst H2BLBAsmPrinter::machineInstrToMCInst(const MachineInstr &MI) {
 void H2BLBAsmPrinter::emitInstruction(const MachineInstr *MI) {
   MCInst TmpInst = machineInstrToMCInst(*MI);
   EmitToStreamer(*OutStreamer, TmpInst);
+}
+
+
+// Register the AsmPrinter in the H2BLB target for other tools to find
+// it (like Clang.)
+extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeH2BLBAsmPrinter() {
+  RegisterAsmPrinter<H2BLBAsmPrinter> Tmp(getTheH2BLBTarget());
 }

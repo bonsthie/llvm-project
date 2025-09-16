@@ -17,6 +17,10 @@ tablegen(LLVM H2BLBGenMCCodeEmitter.inc -gen-emitter)
 tablegen(LLVM H2BLBGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM H2BLBGenFastISel.inc -gen-fast-isel)
 
+tablegen(LLVM H2BLBGenCallingConv.inc -gen-callingconv)
+
+tablegen(LLVM H2BLBGenRegisterBank.inc -gen-register-bank)
+
 
 add_public_tablegen_target(H2BLBCommonTableGen)
 
@@ -34,8 +38,11 @@ add_llvm_target(H2BLBCodeGen
 	H2BLBAsmPrinter.cpp
 	H2BLBIselDagToDag.cpp
 	H2BLBFastIsel.cpp
+	H2BLBCallingConv.cpp
 
 	GISel/H2BLBCallLowering.cpp
+	GISel/H2BLBLeglizerInfo.cpp
+	GISel/H2BLBRegisterBankInfo.cpp
 
 # target depends on the listed libraries
 	LINK_COMPONENTS

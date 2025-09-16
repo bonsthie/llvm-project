@@ -1,7 +1,9 @@
 #ifndef LLVM_LIB_TARGET_H2BLB_H2BLBREGISTERINFO_H
 #define LLVM_LIB_TARGET_H2BLB_H2BLBREGISTERINFO_H
 
-#include "llvm/CodeGen/MachineFunction.h"
+#include "llvm/CodeGen/TargetRegisterInfo.h"
+#include "H2BLBFrameLowering.h"
+
 #define GET_REGINFO_HEADER
 #include "H2BLBGenRegisterInfo.inc"
 

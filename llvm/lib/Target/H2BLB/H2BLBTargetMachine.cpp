@@ -4,7 +4,13 @@
 #include "H2BLBTargetObjectFile.h"
 #include "H2BLBTargetTransformInfo.h"
 #include "TargetInfo/H2BLBTargetInfo.h"
+#include "llvm/CodeGen/GlobalISel/IRTranslator.h"
+#include "llvm/CodeGen/GlobalISel/InstructionSelect.h"
+#include "llvm/CodeGen/GlobalISel/Legalizer.h"
+#include "llvm/CodeGen/GlobalISel/RegBankSelect.h"
+#include "llvm/InitializePasses.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/PassRegistry.h"
 #include "llvm/Passes/PassBuilder.h"
 #include <memory>
 
@@ -38,6 +44,7 @@ H2BLBTargetMachine::H2BLBTargetMachine(const Target &T,  //
                                CM ? *CM : CodeModel::Small, OL),
       TLOF(createTLOF(getTargetTriple())) {
   initAsmInfo();
+  setGlobalISel(true);
 }
 
 H2BLBTargetMachine::~H2BLBTargetMachine() = default;
@@ -101,8 +108,28 @@ void H2BLBPassConfig::addIRPasses() {
 }
 
 bool H2BLBPassConfig::addInstSelector() {
-  addPass(createH2BLBISelDAG(getH2BLBTargetMachine()));
+  // addPass(createH2BLBISelDAG(getH2BLBTargetMachine()));
   return false;
+}
+
+bool H2BLBPassConfig::addIRTranslator() {
+	addPass(new IRTranslator(getOptLevel()));
+	return false;
+}
+
+bool H2BLBPassConfig::addLegalizeMachineIR() {
+	addPass(new Legalizer());
+	return false;
+}
+
+bool H2BLBPassConfig::addRegBankSelect() {
+	addPass(new RegBankSelect());
+	return false;
+}
+
+bool H2BLBPassConfig::addGlobalInstructionSelect() {
+	addPass(new InstructionSelect(getOptLevel()));
+	return false;
 }
 
 ///
@@ -111,4 +138,8 @@ bool H2BLBPassConfig::addInstSelector() {
 
 extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeH2BLBTarget() {
   RegisterTargetMachine<H2BLBTargetMachine> X(llvm::getTheH2BLBTarget());
+
+	PassRegistry &PR = *PassRegistry::getPassRegistry();
+	initializeH2BLBSimpleConstantPropagationPass(PR);
+	initializeGlobalISel(PR);
 }

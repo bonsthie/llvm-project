@@ -74,6 +74,10 @@ private:
                                OperandVector &Operands, MCStreamer &Out,
                                uint64_t &ErrorInfo,
                                bool MatchingInlineAsm) override;
+
+  void addExpr(MCInst &Inst, const MCExpr *Expr) const;
+
+  void addImmOperands(MCInst &Inst, unsigned N) const;
   /// }
 
 /// @name Auto-generated Match Functions
@@ -145,7 +149,7 @@ public:
     }
   }
 
-	void print(raw_ostream &OS, const MCAsmInfo &MAI) const override;
+  void print(raw_ostream &OS, const MCAsmInfo &MAI) const override;
 
   static std::unique_ptr<H2BLBOperand> createToken(StringRef Str, SMLoc S) {
     auto Op = std::make_unique<H2BLBOperand>(k_Token);
@@ -174,11 +178,28 @@ public:
     return Op;
   }
 
+  void addExpr(MCInst &Inst, const MCExpr *Expr) const {
+    assert(Expr && "Expr shouldn't be null!");
+
+    if (auto *CE = dyn_cast<MCConstantExpr>(Expr))
+      Inst.addOperand(MCOperand::createImm(CE->getValue()));
+    else
+      Inst.addOperand(MCOperand::createExpr(Expr));
+  }
+
   // Used by TableGen'ed code.
   void addRegOperands(MCInst &Inst, unsigned N) const {
     assert(N == 1 && "Invalid number of operands!");
     Inst.addOperand(MCOperand::createReg(getReg()));
   }
+
+  // Used by our definition of TableGen (look for the RenderMethod
+  // in the td file.)
+  void addImmOperands(MCInst &Inst, unsigned N) const {
+    assert(N == 1 && "Invalid number of operands!");
+    addExpr(Inst, getImm());
+  }
+
   StringRef getToken() const {
     assert(Kind == k_Token && "Invalid access!");
     return StringRef(Tok.Data, Tok.Length);
@@ -215,7 +236,7 @@ public:
 void H2BLBOperand::print(raw_ostream &OS, const MCAsmInfo &MAI) const {
   switch (Kind) {
   case k_Immediate:
-		MAI.printExpr(OS, *getImm());
+    MAI.printExpr(OS, *getImm());
     break;
   case k_Token:
     OS << "'" << getToken() << "'";
