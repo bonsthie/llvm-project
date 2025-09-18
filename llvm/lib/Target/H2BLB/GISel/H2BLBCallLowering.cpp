@@ -230,14 +230,14 @@ bool H2BLBCallLowering::lowerReturn(MachineIRBuilder &MIRBuilder,
     SmallVector<ArgInfo, 8> SplitArgs;
     CallingConv::ID CC = F.getCallingConv();
 
-    for (unsigned i = 0; i < SplitEVTs.size(); ++i) {
-      Register CurVReg = VRegs[i];
-      ArgInfo CurArgInfo = ArgInfo{CurVReg, SplitEVTs[i].getTypeForEVT(Ctx), 0};
+    for (unsigned Idx = 0; Idx < SplitEVTs.size(); ++Idx) {
+      Register CurVReg = VRegs[Idx];
+      ArgInfo CurArgInfo = ArgInfo{CurVReg, SplitEVTs[Idx].getTypeForEVT(Ctx), 0};
       setArgFlags(CurArgInfo, AttributeList::ReturnIndex, DL, F);
-      if (TLI.getNumRegistersForCallingConv(Ctx, CC, SplitEVTs[i]) == 1) {
-        MVT NewVT = TLI.getRegisterTypeForCallingConv(Ctx, CC, SplitEVTs[i]);
+      if (TLI.getNumRegistersForCallingConv(Ctx, CC, SplitEVTs[Idx]) == 1) {
+        MVT NewVT = TLI.getRegisterTypeForCallingConv(Ctx, CC, SplitEVTs[Idx]);
         // Some types will need extending as specified by the CC.
-        if (EVT(NewVT) != SplitEVTs[i])
+        if (EVT(NewVT) != SplitEVTs[Idx])
           report_fatal_error("Extension not implemented yet");
       }
       splitToValueTypes(CurArgInfo, SplitArgs, DL, CC);
@@ -245,26 +245,6 @@ bool H2BLBCallLowering::lowerReturn(MachineIRBuilder &MIRBuilder,
 
     H2BLBOutgoingValueAssigner Assigner(RetCC_H2BLB_Common, RetCC_H2BLB_Common);
     OutgoingArgHandler Handler(MIRBuilder, MRI, MIB);
-
-    ComputeValueVTs(TLI, DL, Val->getType(), SplitEVTs);
-    llvm::errs() << "[RET] pieces:";
-    for (auto E : SplitEVTs)
-      llvm::errs() << " " << E.getEVTString();
-    llvm::errs() << "  (n=" << SplitEVTs.size() << ")\n";
-
-    SmallVector<CallLowering::ArgInfo, 8> ArgsDbg = SplitArgs;
-    SmallVector<CCValAssign, 16> LocsDbg;
-    CCState Tmp(F.getCallingConv(), /*IsVarArg*/ false, MF, LocsDbg,
-                F.getContext());
-    bool ok = determineAssignments(Assigner, ArgsDbg, Tmp);
-    llvm::errs() << "[RET] ok=" << ok << " locs=" << LocsDbg.size() << "\n";
-    for (unsigned i = 0; i < LocsDbg.size(); ++i) {
-      auto &VA = LocsDbg[i];
-      llvm::errs() << "  loc[" << i << "] ValNo=" << VA.getValNo()
-                   << " ValVT="; VA.getValVT().dump();
-			llvm::errs() << " LocVT="; VA.getLocVT().dump();
-             llvm::errs() << (VA.isRegLoc() ? " reg\n" : " mem\n");
-    }
 
     Success = determineAndHandleAssignments(Handler, Assigner, SplitArgs,
                                             MIRBuilder, CC, F.isVarArg());
@@ -283,7 +263,6 @@ bool H2BLBCallLowering::lowerFormalArguments(MachineIRBuilder &MIRBuilder,
   MachineRegisterInfo &MRI = MF.getRegInfo();
   const DataLayout &DL = F.getDataLayout();
 
-  F.print(outs());
   if (F.isVarArg())
     return false;
 
@@ -294,15 +273,15 @@ bool H2BLBCallLowering::lowerFormalArguments(MachineIRBuilder &MIRBuilder,
   if (!FLI.CanLowerReturn)
     insertSRetIncomingArgument(F, SplitArgs, FLI.DemoteRegister, MRI, DL);
 
-  unsigned i = 0;
+  unsigned Idx = 0;
   for (auto &Arg : F.args()) {
     if (DL.getTypeStoreSize(Arg.getType()).isZero())
       continue;
-    ArgInfo OriginArg{VRegs[i], Arg, i};
-    setArgFlags(OriginArg, i + AttributeList::FirstArgIndex, DL, F);
+    ArgInfo OriginArg{VRegs[Idx], Arg, Idx};
+    setArgFlags(OriginArg, Idx + AttributeList::FirstArgIndex, DL, F);
 
     splitToValueTypes(OriginArg, SplitArgs, DL, F.getCallingConv());
-    ++i;
+    ++Idx;
   }
 
   if (!MBB.empty())

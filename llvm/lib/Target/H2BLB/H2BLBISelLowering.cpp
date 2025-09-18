@@ -1,7 +1,7 @@
 #include "H2BLBISelLowering.h"
 #include "H2BLB.h"
-#include "H2BLBSubtarget.h"
 #include "H2BLBCallingConv.h"
+#include "H2BLBSubtarget.h"
 #include "H2BLBTargetMachine.h"
 
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -414,6 +414,8 @@ const char *H2BLBTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return "H2BLBISD::RETURN_GLUE";
   case H2BLBISD::CALL:
     return "H2BLBISD::CALL";
+  default:
+    llvm_unreachable("no implemented in the SDIsel yet");
   }
   return nullptr;
 }

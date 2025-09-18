@@ -21,6 +21,8 @@ tablegen(LLVM H2BLBGenCallingConv.inc -gen-callingconv)
 
 tablegen(LLVM H2BLBGenRegisterBank.inc -gen-register-bank)
 
+tablegen(LLVM H2BLBGenGlobalISel.inc -gen-global-isel)
+
 
 add_public_tablegen_target(H2BLBCommonTableGen)
 

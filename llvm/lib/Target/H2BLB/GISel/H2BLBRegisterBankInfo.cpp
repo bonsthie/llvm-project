@@ -53,6 +53,7 @@ enum ValueMappingIdx {
 
 const RegisterBankInfo::InstructionMapping &
 H2BLBRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
+  MI.dump();
   const unsigned Opc = MI.getOpcode();
 
   if (!isPreISelGenericOpcode(Opc) || Opc == TargetOpcode::G_PHI) {
@@ -65,10 +66,14 @@ H2BLBRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
   const MachineRegisterInfo &MRI = MF.getRegInfo();
 
   unsigned NumOperands = MI.getNumOperands();
-  const ValueMapping *GPR16ValueMapping =
-      &H2BLB::ValueMappings[H2BLB::GPRB16Idx];
-  const ValueMapping *GPR32ValueMapping =
-      &H2BLB::ValueMappings[H2BLB::GPRB32Idx];
+  auto mapForTy = [&](LLT T) -> const ValueMapping * {
+    unsigned Bits = T.getSizeInBits();
+    if (Bits <= 16)
+      return &H2BLB::ValueMappings[H2BLB::GPRB16Idx];
+    // pointer widths or 32-bit scalars end up here
+    return &H2BLB::ValueMappings[H2BLB::GPRB32Idx];
+  };
+
 
   switch (Opc) {
   case TargetOpcode::G_ADD:
@@ -85,10 +90,22 @@ H2BLBRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
     LLT Ty = MRI.getType(MI.getOperand(0).getReg());
     TypeSize Size = Ty.getSizeInBits();
 
-    const ValueMapping *Mapping =
-        Size == 16 ? GPR16ValueMapping : GPR32ValueMapping;
+	const ValueMapping *Mapping = mapForTy(Ty);
 
     return getInstructionMapping(DefaultMappingID, 1, Mapping, NumOperands);
+  }
+
+	// to be repalce
+  // ===== Loads: result + address =====
+  case TargetOpcode::G_LOAD:
+  case TargetOpcode::G_ZEXTLOAD:
+  case TargetOpcode::G_SEXTLOAD: {
+    LLT ValTy = MRI.getType(MI.getOperand(0).getReg()); // def
+    LLT PtrTy = MRI.getType(MI.getOperand(1).getReg()); // addr
+    SmallVector<const ValueMapping*, 2> Ops;
+    Ops.push_back(mapForTy(ValTy));
+    Ops.push_back(mapForTy(PtrTy));
+    return getInstructionMapping(DefaultMappingID, 1, getOperandsMapping(Ops), /*NumRegOperands*/2);
   }
 
     // if some instructions have more operands (for instance, a PHI
@@ -103,8 +120,7 @@ H2BLBRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
       LLT Ty = MRI.getType(MO.getReg());
       if (!Ty.isValid())
         continue;
-      OpdsMapping[Idx] =
-          Ty.getSizeInBits() == 16 ? GPR16ValueMapping : GPR32ValueMapping;
+      OpdsMapping[Idx] = mapForTy(Ty);
 
       return getInstructionMapping(
           DefaultMappingID, 1, getOperandsMapping(OpdsMapping), NumOperands);

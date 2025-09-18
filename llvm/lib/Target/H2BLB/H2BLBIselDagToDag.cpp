@@ -18,7 +18,7 @@ private:
   void Select(SDNode *N) override;
 
 // gen SelectCode
-#include "H2BLBGenDAGISel.inc"
+// #include "H2BLBGenDAGISel.inc"
 };
 
 class H2BLBDAGToDAGISelLegacy : public SelectionDAGISelLegacy {
@@ -35,7 +35,7 @@ using namespace llvm;
 void H2BLBDAGToDAGIsel::Select(SDNode *N) {
   if (N->isMachineOpcode())
     return;
-  SelectCode(N);
+  // SelectCode(N);
 }
 
 

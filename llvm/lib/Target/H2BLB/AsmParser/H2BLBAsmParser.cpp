@@ -90,6 +90,13 @@ private:
   ParseStatus parseRegister(OperandVector &Operands);
 
 public:
+  enum H2BLBMatchResultTy {
+
+    Match_InvalidSuffix = FIRST_TARGET_MATCH_RESULT_TY,
+#define GET_OPERAND_DIAGNOSTIC_TYPES
+#include "H2BLBGenAsmMatcher.inc"
+
+  };
   H2BLBAsmParser(const MCSubtargetInfo &STI, MCAsmParser &Parser,
                  const MCInstrInfo &MII, const MCTargetOptions &Options)
       : MCTargetAsmParser(Options, STI, MII) {
@@ -203,6 +210,17 @@ public:
   StringRef getToken() const {
     assert(Kind == k_Token && "Invalid access!");
     return StringRef(Tok.Data, Tok.Length);
+  }
+
+
+  template <int N, int M> bool isImmInRange() const {
+    if (!isImm())
+      return false;
+    const MCConstantExpr *MCE = dyn_cast<MCConstantExpr>(getImm());
+    if (!MCE)
+      return false;
+    int64_t Val = MCE->getValue();
+    return (Val >= N && Val <= M);
   }
 
   /// Mandatory method to avoid being an abstract class.
