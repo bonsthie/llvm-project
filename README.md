@@ -17,10 +17,6 @@ Currently, the backend provides:
   * Call lowering (arguments, returns)
   * Target-specific combines and optimizations
 
-Intrinsic & Builtin Plumbing
-
-Upstream Integration
-
 # Main Classes Explained
 
 This is separated into 4 parts: the main lib `Target/H2BLB` and its sub-libs `AsmParser/`, `MCTargetDesc/`, `TargetInfo/`.
