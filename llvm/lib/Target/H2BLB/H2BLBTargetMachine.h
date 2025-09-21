@@ -60,6 +60,7 @@ public:
   bool addLegalizeMachineIR() override;
   bool addRegBankSelect() override;
   bool addGlobalInstructionSelect() override;
+  void addPreLegalizeMachineIR() override;
 };
 
 } // namespace llvm

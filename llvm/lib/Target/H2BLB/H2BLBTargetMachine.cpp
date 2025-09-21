@@ -132,6 +132,10 @@ bool H2BLBPassConfig::addGlobalInstructionSelect() {
 	return false;
 }
 
+void H2BLBPassConfig::addPreLegalizeMachineIR() {
+	addPass(createH2BLBMandatoryPreLegalizerCombiner());
+}
+
 ///
 /// EXTERN
 ///

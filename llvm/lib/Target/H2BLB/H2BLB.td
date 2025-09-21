@@ -4,6 +4,7 @@ include "llvm/Target/Target.td"
 include "H2BLBRegisterInfo.td"
 include "H2BLBCallingConv.td"
 include "H2BLBInstrInfo.td"
+include "GISel/H2BLBCombine.td"
 include "GISel/H2BLBRegisterBankInfo.td"
 
 def H2BLBInstrInfo : InstrInfo;
