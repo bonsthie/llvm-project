@@ -1,5 +1,5 @@
 # H2BLB Custom Backend Learning
-This is a **toy architecture** created to learn how to build an LLVM backend.
+This is a **toy architecture** created to learn how to build an LLVM backend using GISel.
 The main code of this backend is available in [llvm/lib/Target/H2BLB](llvm/lib/Target/H2BLB).
 
 Currently, the backend provides:
@@ -10,6 +10,12 @@ Currently, the backend provides:
 * **Register definitions and handling** (caller/callee saved, reserved registers)
 * **Instruction definitions and handling** (scheduling, properties, pseudo-instructions)
 * **Instruction encoding/mapping** for object file emission (via the MC layer)
+* **GlobalISel support**:
+  * Legalization of generic operations
+  * Register bank assignment
+  * Instruction selection into target opcodes
+  * Call lowering (arguments, returns)
+  * Target-specific combines and optimizations
 
 Intrinsic & Builtin Plumbing
 
@@ -162,6 +168,26 @@ Prints MCInst instructions back to assembly text.
 
 Encodes MCInst instructions into raw binary machine code.
 
+## [GIsel](llvm/lib/Target/H2BLB/GISel)
+
+```
+LLVM IR
+  ↓
+Generic MIR (G_ ops) and Call Lowering
+  ↓
+(H2BLBMandatoryPreLegalizerCombiner)  // cleanup/canonicalization
+  ↓
+(H2BLBLegalizerInfo)                  // make ops legal (widen, narrow, lower)
+  ↓
+(H2BLBRegisterBankInfo)               // assign registers to banks
+  ↓
+(H2BLBInstructionSelector)            // select into real H2BLB instructions
+  ↓
+MachineInstrs (target-specific)
+  ↓
+Register allocation / scheduling / MC lowering
+```
+
 # H2BLB CodeGen `.td` Files (Quick Overview)
 
 ## [`H2BLB.td`](llvm/lib/Target/H2BLB/H2BLB.td)
@@ -184,10 +210,24 @@ Encodes MCInst instructions into raw binary machine code.
 
 ## [`H2BLBRegisterInfo.td`](llvm/lib/Target/H2BLB/H2BLBRegisterInfo.td)
 
-* Declares **registers and classes**
+* Declares **registers and classes**.
 * Defines aliases and reserved regs.
 * Produces `H2BLBGenRegisterInfo.inc`.
 
-todo
+## [`H2BLBCallingConv.td`](llvm/lib/Target/H2BLB/H2BLBCallingConv.td)
 
-gen-dag-isel
+* Declares **calling convention rules** for arguments and returns.
+* Used by both SelectionDAG and GlobalISel call lowering.
+* Produces `H2BLBGenCallingConv.inc`.
+
+## [`H2BLBCombine.td`](llvm/lib/Target/H2BLB/H2BLBCombine.td)
+
+* Declares **target-specific combine rules** for GlobalISel.
+* Simplifies generic instructions (e.g. folding `add x, 0 → x`).
+* Produces `H2BLBGenCombiner.inc`.
+
+## [`H2BLBRegisterBankInfo.td`](llvm/lib/Target/H2BLB/GISel/H2BLBRegisterBankInfo.td)
+
+* Declares **register banks** (e.g. GPR, FPR) for GlobalISel.
+* Defines value mappings between virtual registers and banks.
+* Produces `H2BLBGenRegisterBank.inc`.
