@@ -379,14 +379,75 @@ X86LegalizerInfo::X86LegalizerInfo(const X86Subtarget &STI,
         .scalarize(0);
   }
 
-  for (unsigned Op : {G_SEXTLOAD, G_ZEXTLOAD}) {
-    auto &Action = getActionDefinitionsBuilder(Op);
-    Action.legalForTypesWithMemDesc(
+  {
+    const LLT v4s8 = LTT::fixed_vector(4, 8);
+    const LLT v8s8 = LTT::fixed_vector(8, 8);
+    const LLT v4s16 = LTT::fixed_vector(4, 16);
+    const LLT v2s8 = LTT::fixed_vector(2, 8);
+    const LLT v2s16 = LTT::fixed_vector(2, 16);
+    const LLT v2s32 = LTT::fixed_vector(2, 32);
+
+    auto &LoadAction = getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD});
+    LoadAction.legalForTypesWithMemDesc(
         {{s16, p0, s8, 1}, {s32, p0, s8, 1}, {s32, p0, s16, 1}});
     if (Is64Bit)
-      Action.legalForTypesWithMemDesc(
+      LoadAction.legalForTypesWithMemDesc(
           {{s64, p0, s8, 1}, {s64, p0, s16, 1}, {s64, p0, s32, 1}});
-    // TODO - SSE41/AVX2/AVX512F/AVX512BW vector extensions
+
+    if (HasSSE41 || HasAVX)
+      LoadAction.legalForTypesWithMemDesc({
+          {v8s16, p0, v8s8, 0},
+          {v4s32, p0, v4s8, 0},
+          {v4s32, p0, v4s16, 0},
+          {v2s64, p0, v2s8, 0},
+          {v2s64, p0, v2s16, 0},
+          {v2s64, p0, v2s32, 0},
+      });
+
+    if (HasAVX2)
+      LoadAction.legalForTypesWithMemDesc({
+          {v16s16, p0, v16s8, 0},
+          {v8s32, p0, v8s8, 0},
+          {v4s64, p0, v4s8, 0},
+          {v8s32, p0, v8s16, 0},
+          {v4s64, p0, v4s32, 0},
+      });
+
+    if (HasAVX512) {
+
+      LoadAction.legalForTypesWithMemDesc({
+          {v16s32, p0, v16s8, 0},
+          {v8s64, p0, v8s8, 0},
+          {v16s16, p0, v16s16, 0},
+          {v8s64, p0, v8s16, 0},
+          {v8s64, p0, v8s32, 0},
+      });
+
+      if (HasVLX)
+        LoadAction.legalForTypesWithMemDesc({
+            {v4s32, p0, v4s8, 0},
+            {v8s32, p0, v8s8, 0},
+            {v2s64, p0, v2s8, 0},
+            {v4s64, p0, v4s8, 0},
+            {v4s32, p0, v4s16, 0},
+            {v8s32, p0, v8s16, 0},
+            {v2s64, p0, v2s16, 0},
+            {v4s64, p0, v4s16, 0},
+            {v2s64, p0, v2s32, 0},
+            {v4s64, p0, v4s32, 0},
+        });
+
+      if (HasBWI)
+        LoadAction.legalForTypesWithMemDesc({
+            {v32s16, p0, v32s8, 0},
+        });
+
+      if (HasVLX && HasBWI)
+        LoadAction.legalForTypesWithMemDesc({
+            {v8s16, p0, v8s8, 0},
+            {v16s16, p0, v16s8, 0},
+        });
+    }
   }
 
   // sext, zext, and anyext
