@@ -14,7 +14,9 @@
 #include "X86Subtarget.h"
 #include "X86TargetMachine.h"
 #include "llvm/CodeGen/GlobalISel/GenericMachineInstrs.h"
+#include "llvm/CodeGen/GlobalISel/LegacyLegalizerInfo.h"
 #include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
+#include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
 #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
 #include "llvm/CodeGen/MachineConstantPool.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -91,7 +93,25 @@ X86LegalizerInfo::X86LegalizerInfo(const X86Subtarget &STI,
   // s128 = EXTEND (G_IMPLICIT_DEF s32/s64) -> s128 = G_IMPLICIT_DEF
   getActionDefinitionsBuilder(G_IMPLICIT_DEF)
       .legalFor({p0, s1, s8, s16, s32, s64})
-      .legalFor(Is64Bit, {s128});
+      .legalFor(Is64Bit, {s128})
+      .legalFor(HasSSE2, {v16s8, v8s16, v4s32, v2s64})
+      .legalFor(HasAVX, {v8s32, v4s64})
+      .legalFor(HasAVX2, {v32s8, v16s16, v8s32, v4s64})
+      .legalFor(HasAVX512, {v64s8, v32s16, v16s32, v8s64})
+      .clampMinNumElements(0, s8, 16)
+      .clampMinNumElements(0, s16, 8)
+      .clampMinNumElements(0, s32, 4)
+      .clampMinNumElements(0, s64, 2)
+      .clampMaxNumElements(0, s8, HasBWI ? 64 : (HasAVX2 ? 32 : 16))
+      .clampMaxNumElements(0, s16, HasBWI ? 32 : (HasAVX2 ? 16 : 8))
+      .clampMaxNumElements(0, s32, HasAVX512 ? 16 : (HasAVX2 ? 8 : 4))
+      .clampMaxNumElements(0, s64, HasAVX512 ? 8 : (HasAVX2 ? 4 : 2))
+      .clampMaxNumElements(0, p0,
+                           Is64Bit ? s64MaxVector.getNumElements()
+                                   : s32MaxVector.getNumElements())
+      .widenScalarToNextPow2(0, /*Min=*/32)
+      .clampScalar(0, s8, sMaxScalar)
+      .scalarizeIf(scalarOrEltWiderThan(0, 64), 0);
 
   getActionDefinitionsBuilder(G_CONSTANT)
       .legalFor({p0, s8, s16, s32})
@@ -380,12 +400,13 @@ X86LegalizerInfo::X86LegalizerInfo(const X86Subtarget &STI,
   }
 
   {
-    const LLT v4s8 = LTT::fixed_vector(4, 8);
-    const LLT v8s8 = LTT::fixed_vector(8, 8);
-    const LLT v4s16 = LTT::fixed_vector(4, 16);
-    const LLT v2s8 = LTT::fixed_vector(2, 8);
-    const LLT v2s16 = LTT::fixed_vector(2, 16);
-    const LLT v2s32 = LTT::fixed_vector(2, 32);
+    // chuck of vector
+    const LLT v4s8 = LLT::fixed_vector(4, 8);
+    const LLT v8s8 = LLT::fixed_vector(8, 8);
+    const LLT v4s16 = LLT::fixed_vector(4, 16);
+    const LLT v2s8 = LLT::fixed_vector(2, 8);
+    const LLT v2s16 = LLT::fixed_vector(2, 16);
+    const LLT v2s32 = LLT::fixed_vector(2, 32);
 
     auto &LoadAction = getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD});
     LoadAction.legalForTypesWithMemDesc(
@@ -396,56 +417,57 @@ X86LegalizerInfo::X86LegalizerInfo(const X86Subtarget &STI,
 
     if (HasSSE41 || HasAVX)
       LoadAction.legalForTypesWithMemDesc({
-          {v8s16, p0, v8s8, 0},
-          {v4s32, p0, v4s8, 0},
-          {v4s32, p0, v4s16, 0},
-          {v2s64, p0, v2s8, 0},
-          {v2s64, p0, v2s16, 0},
-          {v2s64, p0, v2s32, 0},
+          {v8s16, p0, v8s8, 1},
+          {v4s32, p0, v4s8, 1},
+          {v4s32, p0, v4s16, 1},
+          {v2s64, p0, v2s8, 1},
+          {v2s64, p0, v2s16, 1},
+          {v2s64, p0, v2s32, 1},
       });
 
     if (HasAVX2)
       LoadAction.legalForTypesWithMemDesc({
-          {v16s16, p0, v16s8, 0},
-          {v8s32, p0, v8s8, 0},
-          {v4s64, p0, v4s8, 0},
-          {v8s32, p0, v8s16, 0},
-          {v4s64, p0, v4s32, 0},
+          {v16s16, p0, v16s8, 1},
+          {v8s32, p0, v8s8, 1},
+          {v4s64, p0, v4s8, 1},
+          {v8s32, p0, v8s16, 1},
+          {v4s64, p0, v4s16, 1},
+          {v4s64, p0, v4s32, 1},
       });
 
     if (HasAVX512) {
 
       LoadAction.legalForTypesWithMemDesc({
-          {v16s32, p0, v16s8, 0},
-          {v8s64, p0, v8s8, 0},
-          {v16s16, p0, v16s16, 0},
-          {v8s64, p0, v8s16, 0},
-          {v8s64, p0, v8s32, 0},
+          {v16s32, p0, v16s8, 1},
+          {v8s64, p0, v8s8, 1},
+          {v16s16, p0, v16s16, 1},
+          {v8s64, p0, v8s16, 1},
+          {v8s64, p0, v8s32, 1},
       });
 
       if (HasVLX)
         LoadAction.legalForTypesWithMemDesc({
-            {v4s32, p0, v4s8, 0},
-            {v8s32, p0, v8s8, 0},
-            {v2s64, p0, v2s8, 0},
-            {v4s64, p0, v4s8, 0},
-            {v4s32, p0, v4s16, 0},
-            {v8s32, p0, v8s16, 0},
-            {v2s64, p0, v2s16, 0},
-            {v4s64, p0, v4s16, 0},
-            {v2s64, p0, v2s32, 0},
-            {v4s64, p0, v4s32, 0},
+            {v4s32, p0, v4s8, 1},
+            {v8s32, p0, v8s8, 1},
+            {v2s64, p0, v2s8, 1},
+            {v4s64, p0, v4s8, 1},
+            {v4s32, p0, v4s16, 1},
+            {v8s32, p0, v8s16, 1},
+            {v2s64, p0, v2s16, 1},
+            {v4s64, p0, v4s16, 1},
+            {v2s64, p0, v2s32, 1},
+            {v4s64, p0, v4s32, 1},
         });
 
       if (HasBWI)
         LoadAction.legalForTypesWithMemDesc({
-            {v32s16, p0, v32s8, 0},
+            {v32s16, p0, v32s8, 1},
         });
 
       if (HasVLX && HasBWI)
         LoadAction.legalForTypesWithMemDesc({
-            {v8s16, p0, v8s8, 0},
-            {v16s16, p0, v16s8, 0},
+            {v8s16, p0, v8s8, 1},
+            {v16s16, p0, v16s8, 1},
         });
     }
   }
