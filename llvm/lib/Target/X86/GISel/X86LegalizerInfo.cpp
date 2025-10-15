@@ -383,28 +383,134 @@ X86LegalizerInfo::X86LegalizerInfo(const X86Subtarget &STI,
         .scalarize(0);
   }
 
-  for (unsigned Op : {G_SEXTLOAD, G_ZEXTLOAD}) {
-    auto &Action = getActionDefinitionsBuilder(Op);
-    Action.legalForTypesWithMemDesc(
+  {
+    // chuck of vector
+    const LLT v4s8 = LLT::fixed_vector(4, 8);
+    const LLT v8s8 = LLT::fixed_vector(8, 8);
+    const LLT v4s16 = LLT::fixed_vector(4, 16);
+    const LLT v2s8 = LLT::fixed_vector(2, 8);
+    const LLT v2s16 = LLT::fixed_vector(2, 16);
+    const LLT v2s32 = LLT::fixed_vector(2, 32);
+
+    auto &LoadAction = getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD});
+    LoadAction.legalForTypesWithMemDesc(
         {{s16, p0, s8, 1}, {s32, p0, s8, 1}, {s32, p0, s16, 1}});
     if (Is64Bit)
-      Action.legalForTypesWithMemDesc(
+      LoadAction.legalForTypesWithMemDesc(
           {{s64, p0, s8, 1}, {s64, p0, s16, 1}, {s64, p0, s32, 1}});
-    // TODO - SSE41/AVX2/AVX512F/AVX512BW vector extensions
+
+    if (HasSSE41 || HasAVX)
+      LoadAction.legalForTypesWithMemDesc({
+          {v8s16, p0, v8s8, 1},
+          {v4s32, p0, v4s8, 1},
+          {v4s32, p0, v4s16, 1},
+          {v2s64, p0, v2s8, 1},
+          {v2s64, p0, v2s16, 1},
+          {v2s64, p0, v2s32, 1},
+      });
+
+    if (HasAVX2)
+      LoadAction.legalForTypesWithMemDesc({
+          {v16s16, p0, v16s8, 1},
+          {v8s32, p0, v8s8, 1},
+          {v4s64, p0, v4s8, 1},
+          {v8s32, p0, v8s16, 1},
+          {v4s64, p0, v4s16, 1},
+          {v4s64, p0, v4s32, 1},
+      });
+
+    if (HasAVX512) {
+
+      LoadAction.legalForTypesWithMemDesc({
+          {v16s32, p0, v16s8, 1},
+          {v8s64, p0, v8s8, 1},
+          {v16s16, p0, v16s16, 1},
+          {v8s64, p0, v8s16, 1},
+          {v8s64, p0, v8s32, 1},
+      });
+
+      if (HasVLX)
+        LoadAction.legalForTypesWithMemDesc({
+            {v4s32, p0, v4s8, 1},
+            {v8s32, p0, v8s8, 1},
+            {v2s64, p0, v2s8, 1},
+            {v4s64, p0, v4s8, 1},
+            {v4s32, p0, v4s16, 1},
+            {v8s32, p0, v8s16, 1},
+            {v2s64, p0, v2s16, 1},
+            {v4s64, p0, v4s16, 1},
+            {v2s64, p0, v2s32, 1},
+            {v4s64, p0, v4s32, 1},
+        });
+
+      if (HasBWI)
+        LoadAction.legalForTypesWithMemDesc({
+            {v32s16, p0, v32s8, 1},
+        });
+
+      if (HasVLX && HasBWI)
+        LoadAction.legalForTypesWithMemDesc({
+            {v8s16, p0, v8s8, 1},
+            {v16s16, p0, v16s8, 1},
+        });
+    }
+    LoadAction.lower();
+
+    getActionDefinitionsBuilder({G_SEXT, G_ZEXT})
+        .legalFor({s8, s16, s32})
+        .legalFor(Is64Bit, {s64})
+        .legalFor(HasSSE41,
+                  {
+                      {v8s16, v8s8},  // too small vector
+                      {v4s32, v4s8},  // too small vector
+                      {v4s32, v4s16}, // too small vector
+                      {v2s64, v2s8},  // too small vector
+                      {v2s64, v2s16}, // too small vector
+                      {v2s64, v2s32}, // too small vector
+                  })
+        .legalFor(HasAVX2,
+                  {
+                      {v16s16, v16s8},
+                      {v8s32, v8s8}, // too small vector
+                      {v4s64, v4s8}, // too small vector
+                      {v8s32, v8s16},
+                      {v4s64, v4s16}, // too small vector
+                      {v4s64, v4s32},
+                  })
+        .legalFor(HasAVX512,
+                  {
+                      {v16s32, v16s8},
+                      {v8s64, v8s8}, // too small vector
+                      {v16s32, v16s16},
+                      {v8s64, v8s16},
+                      {v8s64, v8s32},
+                  })
+        .legalFor(HasBWI, {{v32s16, v32s8}})
+        .widenScalarToNextPow2(0, /*Min=*/8)
+        .clampScalar(0, s8, sMaxScalar)
+        .widenScalarToNextPow2(1, /*Min=*/8)
+        .clampScalar(1, s8, sMaxScalar)
+        .clampMinNumElements(0, s8, 16)
+        .clampMinNumElements(0, s16, 8)
+        .clampMinNumElements(0, s32, 4)
+        .clampMinNumElements(0, s64, 2)
+        .clampMaxNumElements(0, s8, HasAVX512 ? 64 : (HasAVX ? 32 : 16))
+        .clampMaxNumElements(0, s16, HasAVX512 ? 32 : (HasAVX ? 16 : 8))
+        .clampMaxNumElements(0, s32, HasAVX512 ? 16 : (HasAVX ? 8 : 4))
+        .clampMaxNumElements(0, s64, HasAVX512 ? 8 : (HasAVX ? 4 : 2))
+        .lowerIf([=](const LegalityQuery &Q) {
+          return (Q.Types[0].getScalarSizeInBits() >
+                  Q.Types[1].getScalarSizeInBits() * 2) &&
+                 Q.Types[0].isVector() &&
+                 (Q.Types[1].getScalarSizeInBits() == 8 ||
+                  Q.Types[1].getScalarSizeInBits() == 16);
+        })
+      .scalarizeIf(scalarOrEltWiderThan(0, 64), 0);
   }
 
   // sext, zext, and anyext
   getActionDefinitionsBuilder(G_ANYEXT)
       .legalFor({s8, s16, s32, s128})
-      .legalFor(Is64Bit, {s64})
-      .widenScalarToNextPow2(0, /*Min=*/8)
-      .clampScalar(0, s8, sMaxScalar)
-      .widenScalarToNextPow2(1, /*Min=*/8)
-      .clampScalar(1, s8, sMaxScalar)
-      .scalarize(0);
-
-  getActionDefinitionsBuilder({G_SEXT, G_ZEXT})
-      .legalFor({s8, s16, s32})
       .legalFor(Is64Bit, {s64})
       .widenScalarToNextPow2(0, /*Min=*/8)
       .clampScalar(0, s8, sMaxScalar)

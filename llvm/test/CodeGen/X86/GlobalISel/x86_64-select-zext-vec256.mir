@@ -1,0 +1,73 @@
+
+
+
+---
+name:            test_zext_v16s8_to_v16s16
+legalized:       true
+regBankSelected: true
+tracksRegLiveness: true
+registers:
+  - { id: 0, class: vecr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: vecr, preferred-register: '', flags: [  ] }
+body: |
+  bb.0:
+    liveins: $xmm0
+
+    %1:vecr(<16 x s8>) = COPY $xmm0
+    %2:vecr(<16 x s16>) = G_ZEXT %1
+    RET 0, implicit %2
+...
+
+
+---
+name:            test_zext_v8s16_to_v8s32
+legalized:       true
+regBankSelected: true
+tracksRegLiveness: true
+registers:
+  - { id: 0, class: vecr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: vecr, preferred-register: '', flags: [  ] }
+body: |
+  bb.0:
+    liveins: $xmm0
+
+    %1:vecr(<8 x s16>) = COPY $xmm0
+    %2:vecr(<8 x s32>) = G_ZEXT %1
+    RET 0, implicit %2
+...
+
+
+---
+name:            test_zext_v4s32_to_v4s64
+legalized:       true
+regBankSelected: true
+tracksRegLiveness: true
+registers:
+  - { id: 0, class: vecr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: vecr, preferred-register: '', flags: [  ] }
+body: |
+  bb.0:
+    liveins: $xmm0
+
+    %1:vecr(<4 x s32>) = COPY $xmm0
+    %2:vecr(<4 x s64>) = G_ZEXT %1
+    RET 0, implicit %2
+...
+
+
+---
+name:            test_zext_v4s32_to_v4s64
+legalized:       true
+regBankSelected: true
+tracksRegLiveness: true
+registers:
+  - { id: 0, class: vecr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: vecr, preferred-register: '', flags: [  ] }
+body: |
+  bb.0:
+    liveins: $xmm0
+
+    %1:vecr(<4 x s32>) = COPY $xmm0
+    %2:vecr(<4 x s64>) = G_ZEXT %1
+    RET 0, implicit %2
+...

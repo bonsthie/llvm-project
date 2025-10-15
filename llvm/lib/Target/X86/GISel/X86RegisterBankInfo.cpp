@@ -178,6 +178,16 @@ X86GenRegisterBankInfo::getPartialMappingIdx(const MachineInstr &MI,
     default:
       llvm_unreachable("Unsupported register size.");
     }
+  } else if (Ty.isVector()) {
+    // just for test don't keep here
+    unsigned Size = Ty.getSizeInBits();
+    if (Size <= 128)
+      return PMI_VEC128;
+    if (Size <= 256)
+      return PMI_VEC256;
+    if (Size <= 512)
+      return PMI_VEC512;
+    llvm_unreachable("Unsupported register size.");
   } else {
     switch (Ty.getSizeInBits()) {
     case 128:
@@ -383,6 +393,22 @@ X86RegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
     MachineInstr *DefMI = MRI.getVRegDef(VReg);
     bool IsFP = onlyDefinesFP(*DefMI, MRI, TRI);
     getInstrPartialMappingIdxs(MI, MRI, IsFP, OpRegBankIdx);
+    break;
+  }
+  case TargetOpcode::G_UNMERGE_VALUES: {
+    // todo check for baisc one
+
+    LLT SrcTy = MRI.getType(MI.getOperand(MI.getNumOperands() - 1).getReg());
+    // UNMERGE into scalars from a vector should always use FPR.
+    // Likewise if any of the uses are FP instructions.
+    if (SrcTy.isVector() || SrcTy == LLT::scalar(128) ||
+        any_of(MRI.use_nodbg_instructions(MI.getOperand(0).getReg()),
+               [&](MachineInstr &MI) { return onlyUsesFP(MI, MRI, TRI); })) {
+      // Set the register bank of every operand to FPR.
+      for (unsigned Idx = 0, NumOperands = MI.getNumOperands();
+           Idx < NumOperands; ++Idx)
+        OpRegBankIdx[Idx] = PMI_VEC128;
+    }
     break;
   }
   default:
